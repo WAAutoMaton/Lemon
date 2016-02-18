@@ -1,6 +1,7 @@
 /***************************************************************************
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
+    Copyright (C) 2016 Menci
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,8 +27,8 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     editSettings = new Settings(this);
-    connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()),
-            this, SLOT(okayButtonClicked()));
+    connect(ui->buttonBox->button(QDialogButtonBox::Ok), &QPushButton::clicked,
+            this, &OptionsDialog::okayButtonClicked);
 }
 
 OptionsDialog::~OptionsDialog()

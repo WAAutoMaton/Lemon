@@ -1793,14 +1793,9 @@
         <translation type="unfinished">本程序基于&lt;a href=&quot;http://www.gnu.org/licenses/gpl-3.0.html&quot;&gt;GPLv3&lt;/a&gt;许可协议</translation>
     </message>
     <message>
-        <location filename="lemon.cpp" line="598"/>
-        <source>Author&apos;s blog</source>
-        <translation type="unfinished">作者博客</translation>
-    </message>
-    <message>
         <location filename="lemon.cpp" line="599"/>
-        <source>Google Code Page</source>
-        <translation type="unfinished">Google Code页面</translation>
+        <source>GitHub Page</source>
+        <translation type="unfinished">GitHub 页面</translation>
     </message>
     <message>
         <location filename="lemon.cpp" line="600"/>

@@ -1,6 +1,7 @@
 #
 #    Project Lemon - A tiny judging environment for OI contest
 #    Copyright (C) 2011 Zhipeng Jia
+#    Copyright (C) 2016 Menci
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-QT       += core gui network
+QT       += core gui network widgets
 
-TARGET = lemon
+TARGET = Lemon
 TEMPLATE = app
 
 SOURCES += main.cpp \
@@ -140,12 +141,16 @@ unix:FORMS += forms_unix/lemon.ui \
     forms_unix/editvariabledialog.ui \
     forms_unix/addcompilerwizard.ui
 
-TRANSLATIONS += lemon_zh_CN.ts
+TRANSLATIONS += Lemon_zh_CN.ts
 
-win32:RC_FILE = lemon.rc
+win32:RC_FILE = Lemon.rc
 
 win32:LIBS += -lpsapi
 
 win32:CONFIG += qaxcontainer
 
 RESOURCES += resource.qrc
+
+CONFIG += debug_and_release
+
+ICON = icon.icns

@@ -1,6 +1,7 @@
 /***************************************************************************
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
+    Copyright (C) 2016 Menci
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,6 +34,21 @@ void cleanUp() {
     exit(0);
 }
 
+/*
+ * On Linux the member ru_maxrss of struct rusage is "the maximum resident set size used (in *kilobytes*)".
+ * On OS X it's "the maximum resident set size utilized (in *bytes*)".
+ *
+ * convertMemoryUsage() will return the value in bytes. **
+ */
+
+int convertMemoryUsage(int maxrss) {
+#ifdef __APPLE__
+	return maxrss;
+#else
+	return maxrss * 1024;
+#endif
+}
+
 int main(int argc, char *argv[]) {
     int timeLimit, memoryLimit;
     sscanf(argv[5], "%d", &timeLimit);
@@ -52,13 +68,13 @@ int main(int argc, char *argv[]) {
         if (WIFEXITED(status)) {
             if (WEXITSTATUS(status) == 1) return 1;
             printf("%d\n", (int)(usage.ru_utime.tv_sec * 1000 + usage.ru_utime.tv_usec / 1000));
-            printf("%d\n", (int)(usage.ru_maxrss) * 1024);
+            printf("%d\n", convertMemoryUsage((int)(usage.ru_maxrss)));
             if (WEXITSTATUS(status) != 0) return 2;
             return 0;
         }
         if (WIFSIGNALED(status)) {
             printf("%d\n", (int)(usage.ru_utime.tv_sec * 1000 + usage.ru_utime.tv_usec / 1000));
-            printf("%d\n", (int)(usage.ru_maxrss) * 1024);
+            printf("%d\n", convertMemoryUsage((int)(usage.ru_maxrss)));
             if (WTERMSIG(status) == SIGXCPU) return 3;
             if (WTERMSIG(status) == SIGKILL) return 4;
             if (WTERMSIG(status) == SIGABRT) return 4;

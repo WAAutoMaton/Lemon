@@ -1,6 +1,7 @@
 /***************************************************************************
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
+    Copyright (C) 2016 Menci
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -87,7 +88,7 @@ void OpenContestWidget::refreshContestList()
         i ++;
     }
     QHeaderView *header = ui->recentContest->horizontalHeader();
-    header->setResizeMode(QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 void OpenContestWidget::addContest()

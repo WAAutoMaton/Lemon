@@ -1,6 +1,7 @@
 /***************************************************************************
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
+    Copyright (C) 2016 Menci
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,6 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************/
 
+#include "crossplatformhelper.h"
 #include "settings.h"
 #include "compiler.h"
 

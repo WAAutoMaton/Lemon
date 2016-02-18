@@ -1,6 +1,7 @@
 /***************************************************************************
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
+    Copyright (C) 2016 Menci      
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,7 +39,7 @@ TestCaseEditWidget::TestCaseEditWidget(QWidget *parent) :
     ui->fullScore->setValidator(new QIntValidator(1, Settings::upperBoundForFullScore(), this));
     ui->timeLimit->setValidator(new QIntValidator(1, Settings::upperBoundForTimeLimit(), this));
     ui->memoryLimit->setValidator(new QIntValidator(1, Settings::upperBoundForMemoryLimit(), this));
-    ui->fileList->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    ui->fileList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     
     ui->inputFileEdit->setFilters(QDir::Files);
     ui->outputFileEdit->setFilters(QDir::Files);

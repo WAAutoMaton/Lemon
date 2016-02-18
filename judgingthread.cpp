@@ -1,6 +1,7 @@
 /***************************************************************************
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
+    Copyright (C) 2016 Menci
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,11 +19,12 @@
 
 #include <cstring>
 #include <cstdio>
+#include "crossplatformhelper.h"
 #include "judgingthread.h"
 #include "settings.h"
 #include "task.h"
 
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
 #include <windows.h>
 
 extern "C" {
@@ -629,7 +631,7 @@ void JudgingThread::runProgram()
     result = CorrectAnswer;
     int extraTime = qCeil(qMax(2000, timeLimit * 2) * extraTimeRatio);
     
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
     SetErrorMode(SEM_NOGPFAULTERRORBOX);
     
     STARTUPINFO si;
@@ -781,7 +783,7 @@ void JudgingThread::runProgram()
     CloseHandle(pi.hThread);
 #endif
     
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
     QFile::copy(":/watcher/watcher_unix", workingDirectory + "watcher");
     QProcess::execute(QString("chmod +wx \"") + workingDirectory + "watcher" + "\"");
     

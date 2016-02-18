@@ -1,6 +1,7 @@
 /***************************************************************************
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
+    Copyright (C) 2016 Menci
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,6 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************/
 
+#include "crossplatformhelper.h"
 #include "assignmentthread.h"
 #include "judgingthread.h"
 #include "settings.h"
@@ -156,10 +158,10 @@ bool AssignmentThread::traditionalTaskPrepare()
                     }
                     
                     if (compilerList[i]->getCompilerType() == Compiler::Typical) {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
                                 executableFile = task->getSourceFileName() + ".exe";
 #endif
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
                                 executableFile = task->getSourceFileName();
 #endif
                                 interpreterFlag = false;

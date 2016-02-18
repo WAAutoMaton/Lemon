@@ -4,6 +4,8 @@
 #include <QtCore>
 #include <QtGui>
 #include <QWizard>
+#include <QMessageBox>
+#include <QFileDialog>
 
 namespace Ui {
     class AddCompilerWizard;

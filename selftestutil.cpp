@@ -1,6 +1,7 @@
 /***************************************************************************
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
+    Copyright (C) 2016 Menci
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,6 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************/
 
+#include "crossplatformhelper.h"
 #include "selftestutil.h"
 #include "contest.h"
 #include "task.h"
@@ -33,10 +35,10 @@ void SelfTestUtil::clearPath(const QString &curDir)
     QStringList fileList = dir.entryList(QDir::Files);
     for (int i = 0; i < fileList.size(); i ++)
         if (! dir.remove(fileList[i])) {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
             QProcess::execute(QString("attrib -R \"") + curDir + fileList[i] + "\"");
 #endif
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
             QProcess::execute(QString("chmod +w \"") + curDir + fileList[i] + "\"");
 #endif
             dir.remove(fileList[i]);
@@ -62,7 +64,7 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
     for (int i = 0; i < taskList.size(); i ++) {
         QDir(Settings::selfTestPath()).mkdir(taskList[i]->getProblemTile());
         QList<TestCase*> testCaseList = taskList[i]->getTestCaseList();
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
         QFile file(Settings::selfTestPath() + taskList[i]->getProblemTile() + QDir::separator() + "check.bat");
         if (! file.open(QFile::WriteOnly | QFile::Text)) {
             QApplication::restoreOverrideCursor();
@@ -79,7 +81,7 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
         dummyStream << endl;
         dummy.close();
 #endif
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
         QFile file(Settings::selfTestPath() + taskList[i]->getProblemTile() + QDir::separator() + "check.sh");
         if (! file.open(QFile::WriteOnly | QFile::Text)) {
             QApplication::restoreOverrideCursor();
@@ -88,21 +90,21 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
         }
 #endif
         QTextStream out(&file);
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
         out << "@echo off" << endl;
 #endif
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
         out << "#!/bin/bash" << endl;
 #endif
         if (taskList[i]->getComparisonMode() == Task::RealNumberMode) {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
             QFile::copy(":/judge/realjudge_win32.exe",
                         Settings::selfTestPath() + taskList[i]->getProblemTile()
                         + QDir::separator() + "realjudge.exe");
             QProcess::execute(QString("attrib -R \"") + Settings::selfTestPath() + taskList[i]->getProblemTile()
                               + QDir::separator() + "realjudge.exe" + "\"");
 #endif
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
             QFile::copy(":/judge/realjudge_linux",
                         Settings::selfTestPath() + taskList[i]->getProblemTile()
                         + QDir::separator() + "realjudge");
@@ -155,7 +157,7 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
                                          QMessageBox::Ok);
                     return;
                 }
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
                 if (! taskList[i]->getStandardInputCheck() && taskList[i]->getTaskType() == Task::Traditional) {
                     out << QString("copy \"%1\" \"%2\" >nul").arg(inputFile,
                                                                   taskList[i]->getInputFileName()) << endl;
@@ -226,7 +228,7 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
                 }
                 out << "echo." << endl << endl;
 #endif
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
                 if (! taskList[i]->getStandardInputCheck() && taskList[i]->getTaskType() == Task::Traditional) {
                     out << QString("cp %1 %2").arg(inputFile,
                                                    taskList[i]->getInputFileName()) << endl;
@@ -313,7 +315,7 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
             }
         }
         file.close();
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
         QProcess::execute(QString("chmod +x \"") + Settings::selfTestPath() + taskList[i]->getProblemTile()
                           + QDir::separator() + "check.sh" + "\"");
 #endif

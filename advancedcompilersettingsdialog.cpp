@@ -1,6 +1,7 @@
 /***************************************************************************
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
+    Copyright (C) 2016 Menci
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,6 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************/
 
+#include "crossplatformhelper.h"
 #include "advancedcompilersettingsdialog.h"
 #include "ui_advancedcompilersettingsdialog.h"
 #include "environmentvariablesdialog.h"
@@ -195,12 +197,12 @@ void AdvancedCompilerSettingsDialog::interpreterLocationChanged()
 
 void AdvancedCompilerSettingsDialog::selectCompilerLocation()
 {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), tr("Executable files (*.exe)"));
 #endif
     
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), tr("Executable files (*.*)"));
 #endif
@@ -212,12 +214,12 @@ void AdvancedCompilerSettingsDialog::selectCompilerLocation()
 
 void AdvancedCompilerSettingsDialog::selectInterpreterLocation()
 {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
     QString location = QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"),
                                                     QDir::rootPath(), tr("Executable files (*.exe)"));
 #endif
     
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"),
                                                     QDir::rootPath(), tr("Executable files (*.*)"));
 #endif

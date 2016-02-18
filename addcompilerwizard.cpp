@@ -1,3 +1,4 @@
+#include "crossplatformhelper.h"
 #include "addcompilerwizard.h"
 #include "ui_addcompilerwizard.h"
 #include "compiler.h"
@@ -12,7 +13,7 @@ AddCompilerWizard::AddCompilerWizard(QWidget *parent) :
     ui->bytecodeFileExtensions->setValidator(new QRegExpValidator(QRegExp("(\\w+;)*\\w+"), this));
     ui->javaMemoryLimit->setValidator(new QIntValidator(64, 2048, this));
     
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
     if (QFileInfo("/usr/bin/gcc").exists())
         ui->gccPath->setText("/usr/bin/gcc");
     if (QFileInfo("/usr/bin/g++").exists())
@@ -249,12 +250,12 @@ void AddCompilerWizard::compilerTypeChanged()
 
 void AddCompilerWizard::selectCompilerLocation()
 {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), tr("Executable files (*.exe)"));
 #endif
     
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), tr("Executable files (*.*)"));
 #endif
@@ -266,12 +267,12 @@ void AddCompilerWizard::selectCompilerLocation()
 
 void AddCompilerWizard::selectInterpreterLocation()
 {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
     QString location = QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"),
                                                     QDir::rootPath(), tr("Executable files (*.exe)"));
 #endif
     
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"),
                                                     QDir::rootPath(), tr("Executable files (*.*)"));
 #endif
@@ -283,12 +284,12 @@ void AddCompilerWizard::selectInterpreterLocation()
 
 void AddCompilerWizard::selectGccPath()
 {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "gcc (gcc.exe)");
 #endif
     
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "gcc (gcc)");
 #endif
@@ -300,12 +301,12 @@ void AddCompilerWizard::selectGccPath()
 
 void AddCompilerWizard::selectGppPath()
 {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "g++ (g++.exe)");
 #endif
     
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "g++ (g++)");
 #endif
@@ -317,12 +318,12 @@ void AddCompilerWizard::selectGppPath()
 
 void AddCompilerWizard::selectFpcPath()
 {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "fpc (fpc.exe)");
 #endif
     
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "fpc (fpc)");
 #endif
@@ -334,12 +335,12 @@ void AddCompilerWizard::selectFpcPath()
 
 void AddCompilerWizard::selectFbcPath()
 {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "fbc (fbc.exe)");
 #endif
     
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "fbc (fbc)");
 #endif
@@ -351,12 +352,12 @@ void AddCompilerWizard::selectFbcPath()
 
 void AddCompilerWizard::selectJavacPath()
 {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "javac (javac.exe)");
 #endif
     
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "javac (javac)");
 #endif
@@ -368,12 +369,12 @@ void AddCompilerWizard::selectJavacPath()
 
 void AddCompilerWizard::selectJavaPath()
 {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
     QString location = QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"),
                                                     QDir::rootPath(), "java (java.exe)");
 #endif
     
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"),
                                                     QDir::rootPath(), "java (java)");
 #endif
@@ -385,12 +386,12 @@ void AddCompilerWizard::selectJavaPath()
 
 void AddCompilerWizard::selectPythonPath()
 {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
     QString location = QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"),
                                                     QDir::rootPath(), "python (python.exe)");
 #endif
     
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"),
                                                     QDir::rootPath(), "python (python)");
 #endif
@@ -427,7 +428,7 @@ void AddCompilerWizard::accept()
             } else {
                 compiler->addConfiguration("default", "-o %s %s.*", "");
             }
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
             QProcessEnvironment environment;
             QString path = QFileInfo(ui->gccPath->text()).absolutePath();
             path.replace('/', QDir::separator());
@@ -447,7 +448,7 @@ void AddCompilerWizard::accept()
             } else {
                 compiler->addConfiguration("default", "-o %s %s.*", "");
             }
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
             QProcessEnvironment environment;
             QString path = QFileInfo(ui->gppPath->text()).absolutePath();
             path.replace('/', QDir::separator());

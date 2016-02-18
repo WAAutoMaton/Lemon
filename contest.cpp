@@ -1,6 +1,7 @@
 /***************************************************************************
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
+    Copyright (C) 2016 Menci
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,6 +18,7 @@
 ***************************************************************************/
 
 #include <QMessageBox>
+#include "crossplatformhelper.h"
 #include "contest.h"
 #include "task.h"
 #include "testcase.h"
@@ -145,10 +147,10 @@ void Contest::clearPath(const QString &curDir)
     QStringList fileList = dir.entryList(QDir::Files);
     for (int i = 0; i < fileList.size(); i ++) {
         if (! dir.remove(fileList[i])) {
-#ifdef Q_OS_WIN32
+#ifdef LEMON_OS_WIN32
             QProcess::execute(QString("attrib -R \"") + curDir + fileList[i] + "\"");
 #endif
-#ifdef Q_OS_LINUX
+#ifdef LEMON_OS_UNIX
             QProcess::execute(QString("chmod +w \"") + curDir + fileList[i] + "\"");
 #endif
             dir.remove(fileList[i]);

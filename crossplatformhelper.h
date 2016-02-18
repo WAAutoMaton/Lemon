@@ -1,7 +1,6 @@
 /***************************************************************************
     This file is part of Project Lemon
-    Copyright (C) 2011 Zhipeng Jia
-    Copyright (C) 2016 Menci
+	Copyright (C) 2016 Menci
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,40 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************/
 
-#ifndef EXPORTUTIL_H
-#define EXPORTUTIL_H
-
-#include <QtCore>
-#include <QtGui>
-#include <QObject>
-#include <QMessageBox>
-#include <QApplication>
-#include <QFileDialog>
-
-#ifdef Q_OS_WIN32
-#include <QAxObject>
+#ifdef __APPLE__
+#	define LEMON_OS_UNIX
+#elif __linux__
+#	define LEMON_OS_LINUX
+#elif _WIN32
+#	define LEMON_OS_WIN32
 #endif
-
-class Contest;
-class Contestant;
-
-class ExportUtil : public QObject
-{
-    Q_OBJECT
-public:
-    explicit ExportUtil(QObject *parent = 0);
-    static void exportResult(QWidget*, Contest*);
-
-private:
-    static QString getContestantHtmlCode(Contest*, Contestant*);
-    static void exportHtml(QWidget*, Contest*, const QString&);
-    static void exportCsv(QWidget*, Contest*, const QString&);
-    static void exportXls(QWidget*, Contest*, const QString&);
-    
-signals:
-    
-public slots:
-    
-};
-
-#endif // EXPORTUTIL_H

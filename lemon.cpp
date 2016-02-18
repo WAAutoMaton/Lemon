@@ -1,6 +1,7 @@
 /***************************************************************************
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
+    Copyright (C) 2016 Menci
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -100,7 +101,7 @@ Lemon::Lemon(QWidget *parent) :
     QApplication::installTranslator(appTranslator);
     QApplication::installTranslator(qtTranslator);
     
-    QStringList fileList = QDir(":/translation").entryList(QStringList() << "lemon_*.qm", QDir::Files);
+    QStringList fileList = QDir(":/translation").entryList(QStringList() << "Lemon_*.qm", QDir::Files);
     for (int i = 0; i < fileList.size(); i ++) {
         appTranslator->load(QString(":/translation/%1").arg(fileList[i]));
         QAction *newLanguage = new QAction(appTranslator->translate("Lemon", "English"), this);
@@ -181,7 +182,7 @@ void Lemon::loadUiLanguage()
     for (int i = 0; i < languageActions.size(); i ++) {
         if (languageActions[i]->data().toString() == settings->getUiLanguage()) {
             languageActions[i]->setChecked(true);
-            appTranslator->load(QString(":/translation/lemon_%1.qm").arg(settings->getUiLanguage()));
+            appTranslator->load(QString(":/translation/Lemon_%1.qm").arg(settings->getUiLanguage()));
             qtTranslator->load(QString(":/translation/qt_%1.qm").arg(settings->getUiLanguage()));
             return;
         }
@@ -518,7 +519,7 @@ void Lemon::addTask(const QString &title, const QList<QPair<QString, QString> > 
 bool Lemon::compareFileName(const QPair<QString, QString> &a, const QPair<QString, QString> &b)
 {
     return a.first.length() < b.first.length()
-            || a.first.length() == b.first.length() && QString::localeAwareCompare(a.first, b.first) < 0;
+            || (a.first.length() == b.first.length() && QString::localeAwareCompare(a.first, b.first) < 0);
 }
 
 void Lemon::addTasksAction()
@@ -603,13 +604,13 @@ void Lemon::aboutLemon()
     QString text;
     text += "<h2>Project Lemon</h2>";
     text += tr("A tiny judging environment for OI contest") + "<br>";
-    text += tr("Version 1.2 Beta") + "<br>";
+    text += tr("Version 1.3 Beta") + "<br>";
     text += tr("Build Date: %1").arg(__DATE__) + "<br>";
-    text += tr("Copyright (c) 2011 Zhipeng Jia") + "<br>";
+    text += tr("Copyright (c) 2011 <a href=\"http://hi.baidu.com/oimaster\">Zhipeng Jia</a>") + "<br>";
+    text += tr("Copyright (c) 2016 <a href=\"https://menci.moe/\">Menci</a>") + "<br>";
     text += tr("This program is under the <a href=\"http://www.gnu.org/licenses/gpl-3.0.html\">GPLv3</a> license")
-            + "<br>";
-    text += QString("<a href=\"http://hi.baidu.com/oimaster\">") + tr("Author\'s blog") + "</a><br>";
-    text += QString("<a href=\"http://code.google.com/p/project-lemon\">") + tr("Google Code Page") + "</a>";
+            + "<br><br>";
+    text += QString("<a href=\"https://github.com/OpenOI/Lemon\">") + tr("GitHub Page") + "</a>";
     QMessageBox::about(this, tr("About Lemon"), text);
 }
 

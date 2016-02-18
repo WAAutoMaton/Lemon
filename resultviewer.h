@@ -1,6 +1,7 @@
 /***************************************************************************
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
+    Copyright (C) 2016 Menci
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,6 +23,13 @@
 #include <QtCore>
 #include <QtGui>
 #include <QTableWidget>
+#include <QAction>
+#include <QMessageBox>
+#include <QHBoxLayout>
+#include <QApplication>
+#include <QMenu>
+#include <QCheckBox>
+#include <QHeaderView>
 
 class Contest;
 
