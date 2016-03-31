@@ -17,9 +17,11 @@
 ***************************************************************************/
 
 #ifdef __APPLE__
+#	define LEMON_OS_OSX
 #	define LEMON_OS_UNIX
 #elif __linux__
 #	define LEMON_OS_LINUX
+#	define LEMON_OS_UNIX
 #elif _WIN32
 #	define LEMON_OS_WIN32
 #endif
