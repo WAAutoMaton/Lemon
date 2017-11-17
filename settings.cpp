@@ -360,12 +360,12 @@ int Settings::upperBoundForFullScore()
 
 int Settings::upperBoundForTimeLimit()
 {
-    return 1000 * 60 * 10;
+    return 1000 * 60 * 100;
 }
 
 int Settings::upperBoundForMemoryLimit()
 {
-    return 1024;
+    return 10240;
 }
 
 int Settings::upperBoundForFileSizeLimit()
