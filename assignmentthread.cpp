@@ -148,7 +148,6 @@ bool AssignmentThread::traditionalTaskPrepare()
         }
         
         if (! sourceFile.isEmpty()) {
-            qDebug() <<sourceFile;
             QDir(Settings::temporaryPath()).mkdir(contestantName);
 
             if (sourceFile.indexOf("/")!=-1)//如果源文件在子文件夹内则需要特殊处理一下
