@@ -22,6 +22,7 @@
 #include "addcompilerwizard.h"
 #include "settings.h"
 #include "compiler.h"
+#include <QAction>
 
 CompilerSettings::CompilerSettings(QWidget *parent) :
     QWidget(parent),
