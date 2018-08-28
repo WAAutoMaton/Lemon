@@ -18,50 +18,46 @@
 ***************************************************************************/
 
 #include "testcaseeditwidget.h"
-#include "ui_testcaseeditwidget.h"
 #include "settings.h"
 #include "testcase.h"
+#include "ui_testcaseeditwidget.h"
 
-TestCaseEditWidget::TestCaseEditWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::TestCaseEditWidget)
+#include <QAction>
+
+TestCaseEditWidget::TestCaseEditWidget(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::TestCaseEditWidget)
 {
     ui->setupUi(this);
-    
+
     editTestCase = 0;
-    
+
     deleteAction = new QAction(this);
     deleteAction->setShortcutContext(Qt::WidgetShortcut);
     deleteAction->setShortcut(QKeySequence::Delete);
     deleteAction->setEnabled(false);
     ui->fileList->addAction(deleteAction);
-    
+
     ui->fullScore->setValidator(new QIntValidator(1, Settings::upperBoundForFullScore(), this));
     ui->timeLimit->setValidator(new QIntValidator(1, Settings::upperBoundForTimeLimit(), this));
     ui->memoryLimit->setValidator(new QIntValidator(1, Settings::upperBoundForMemoryLimit(), this));
     ui->fileList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    
+
     ui->inputFileEdit->setFilters(QDir::Files);
     ui->outputFileEdit->setFilters(QDir::Files);
-    connect(this, SIGNAL(dataPathChanged()),
-            ui->inputFileEdit, SLOT(refreshFileList()));
-    connect(this, SIGNAL(dataPathChanged()),
-            ui->outputFileEdit, SLOT(refreshFileList()));
-    
-    connect(ui->addButton, SIGNAL(clicked()),
-            this, SLOT(addSingleCase()));
-    connect(deleteAction, SIGNAL(triggered()),
-            this, SLOT(deleteSingleCase()));
-    connect(ui->fullScore, SIGNAL(textChanged(QString)),
-            this, SLOT(fullScoreChanged(QString)));
-    connect(ui->timeLimit, SIGNAL(textChanged(QString)),
-            this, SLOT(timeLimitChanged(QString)));
-    connect(ui->memoryLimit, SIGNAL(textChanged(QString)),
-            this, SLOT(memoryLimitChanged(QString)));
-    connect(ui->fileList, SIGNAL(itemSelectionChanged()),
-            this, SLOT(fileListSelectionChanged()));
-    connect(ui->fileList, SIGNAL(itemChanged(QTableWidgetItem*)),
-            this, SLOT(fileListItemChanged(QTableWidgetItem*)));
+    connect(this, SIGNAL(dataPathChanged()), ui->inputFileEdit, SLOT(refreshFileList()));
+    connect(this, SIGNAL(dataPathChanged()), ui->outputFileEdit, SLOT(refreshFileList()));
+
+    connect(ui->addButton, SIGNAL(clicked()), this, SLOT(addSingleCase()));
+    connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteSingleCase()));
+    connect(ui->fullScore, SIGNAL(textChanged(QString)), this, SLOT(fullScoreChanged(QString)));
+    connect(ui->timeLimit, SIGNAL(textChanged(QString)), this, SLOT(timeLimitChanged(QString)));
+    connect(ui->memoryLimit, SIGNAL(textChanged(QString)), this, SLOT(memoryLimitChanged(QString)));
+    connect(ui->fileList, SIGNAL(itemSelectionChanged()), this, SLOT(fileListSelectionChanged()));
+    connect(ui->fileList,
+            SIGNAL(itemChanged(QTableWidgetItem *)),
+            this,
+            SLOT(fileListItemChanged(QTableWidgetItem *)));
 }
 
 TestCaseEditWidget::~TestCaseEditWidget()
@@ -81,12 +77,13 @@ void TestCaseEditWidget::changeEvent(QEvent *event)
 
 void TestCaseEditWidget::refreshFileList()
 {
-    if (! editTestCase) return;
+    if (!editTestCase)
+        return;
     ui->fileList->setRowCount(0);
     QStringList inputFiles = editTestCase->getInputFiles();
     QStringList outputFiles = editTestCase->getOutputFiles();
     ui->fileList->setRowCount(inputFiles.size());
-    for (int i = 0; i < ui->fileList->rowCount(); i ++) {
+    for (int i = 0; i < ui->fileList->rowCount(); i++) {
         QTableWidgetItem *inputFile = new QTableWidgetItem(inputFiles[i]);
         QTableWidgetItem *outputFile = new QTableWidgetItem(outputFiles[i]);
         ui->fileList->setItem(i, 0, inputFile);
@@ -97,7 +94,8 @@ void TestCaseEditWidget::refreshFileList()
 void TestCaseEditWidget::setEditTestCase(TestCase *testCase, bool check)
 {
     editTestCase = testCase;
-    if (! editTestCase) return;
+    if (!editTestCase)
+        return;
     ui->fullScore->setText(QString("%1").arg(editTestCase->getFullScore()));
     ui->timeLimit->setText(QString("%1").arg(editTestCase->getTimeLimit()));
     ui->memoryLimit->setText(QString("%1").arg(editTestCase->getMemoryLimit()));
@@ -124,18 +122,20 @@ void TestCaseEditWidget::addSingleCase()
         QMessageBox::warning(this, tr("Error"), tr("Empty input file name!"), QMessageBox::Close);
         return;
     }
-    
+
     if (ui->outputFileEdit->text().isEmpty()) {
         ui->outputFileEdit->setFocus();
         QMessageBox::warning(this, tr("Error"), tr("Empty output file name!"), QMessageBox::Close);
         return;
     }
-    
+
     ui->fileList->setRowCount(ui->fileList->rowCount() + 1);
     editTestCase->addSingleCase(ui->inputFileEdit->text(), ui->outputFileEdit->text());
-    ui->fileList->setItem(ui->fileList->rowCount() - 1, 0,
+    ui->fileList->setItem(ui->fileList->rowCount() - 1,
+                          0,
                           new QTableWidgetItem(ui->inputFileEdit->text()));
-    ui->fileList->setItem(ui->fileList->rowCount() - 1, 1,
+    ui->fileList->setItem(ui->fileList->rowCount() - 1,
+                          1,
                           new QTableWidgetItem(ui->outputFileEdit->text()));
     ui->inputFileEdit->clear();
     ui->outputFileEdit->clear();
@@ -144,7 +144,7 @@ void TestCaseEditWidget::addSingleCase()
 void TestCaseEditWidget::deleteSingleCase()
 {
     QTableWidgetSelectionRange range = ui->fileList->selectedRanges().at(0);
-    for (int i = 0; i <= range.rowCount(); i ++) {
+    for (int i = 0; i <= range.rowCount(); i++) {
         editTestCase->deleteSingleCase(range.topRow());
     }
     refreshFileList();
@@ -152,7 +152,8 @@ void TestCaseEditWidget::deleteSingleCase()
 
 void TestCaseEditWidget::fileListSelectionChanged()
 {
-    if (! editTestCase) return;
+    if (!editTestCase)
+        return;
     QList<QTableWidgetSelectionRange> range = ui->fileList->selectedRanges();
     if (range.size() == 1 && range[0].columnCount() == 2) {
         deleteAction->setEnabled(true);
@@ -163,7 +164,8 @@ void TestCaseEditWidget::fileListSelectionChanged()
 
 void TestCaseEditWidget::fileListItemChanged(QTableWidgetItem *item)
 {
-    if (! editTestCase) return;
+    if (!editTestCase)
+        return;
     if (item) {
         if (item->column() == 0) {
             editTestCase->setInputFiles(item->row(), item->text());
@@ -175,18 +177,21 @@ void TestCaseEditWidget::fileListItemChanged(QTableWidgetItem *item)
 
 void TestCaseEditWidget::fullScoreChanged(const QString &text)
 {
-    if (! editTestCase) return;
+    if (!editTestCase)
+        return;
     editTestCase->setFullScore(text.toInt());
 }
 
 void TestCaseEditWidget::timeLimitChanged(const QString &text)
 {
-    if (! editTestCase) return;
+    if (!editTestCase)
+        return;
     editTestCase->setTimeLimit(text.toInt());
 }
 
 void TestCaseEditWidget::memoryLimitChanged(const QString &text)
 {
-    if (! editTestCase) return;
+    if (!editTestCase)
+        return;
     editTestCase->setMemoryLimit(text.toInt());
 }
