@@ -24,8 +24,8 @@
 #include "testcase.h"
 #include "settings.h"
 
-SelfTestUtil::SelfTestUtil(QObject *parent) :
-    QObject(parent)
+SelfTestUtil::SelfTestUtil(QObject *parent)
+    : QObject(parent)
 {
 }
 
@@ -33,8 +33,8 @@ void SelfTestUtil::clearPath(const QString &curDir)
 {
     QDir dir(curDir);
     QStringList fileList = dir.entryList(QDir::Files);
-    for (int i = 0; i < fileList.size(); i ++)
-        if (! dir.remove(fileList[i])) {
+    for (int i = 0; i < fileList.size(); i++)
+        if (!dir.remove(fileList[i])) {
 #ifdef LEMON_OS_WIN32
             QProcess::execute(QString("attrib -R \"") + curDir + fileList[i] + "\"");
 #endif
@@ -44,7 +44,7 @@ void SelfTestUtil::clearPath(const QString &curDir)
             dir.remove(fileList[i]);
         }
     QStringList dirList = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
-    for (int i = 0; i < dirList.size(); i ++) {
+    for (int i = 0; i < dirList.size(); i++) {
         clearPath(curDir + dirList[i] + QDir::separator());
         dir.rmdir(dirList[i]);
     }
@@ -55,24 +55,27 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
     QApplication::setOverrideCursor(Qt::WaitCursor);
     if (QDir(Settings::selfTestPath()).exists())
         clearPath(Settings::selfTestPath());
-    if (! QDir(Settings::selfTestPath()).exists() && ! QDir().mkdir(Settings::selfTestPath())) {
+    if (!QDir(Settings::selfTestPath()).exists() && !QDir().mkdir(Settings::selfTestPath())) {
         QApplication::restoreOverrideCursor();
         QMessageBox::warning(widget, tr("Lemon"), tr("Cannot make directory"), QMessageBox::Ok);
         return;
     }
-    QList<Task*> taskList = contest->getTaskList();
-    for (int i = 0; i < taskList.size(); i ++) {
+    QList<Task *> taskList = contest->getTaskList();
+    for (int i = 0; i < taskList.size(); i++) {
         QDir(Settings::selfTestPath()).mkdir(taskList[i]->getProblemTile());
-        QList<TestCase*> testCaseList = taskList[i]->getTestCaseList();
+        QList<TestCase *> testCaseList = taskList[i]->getTestCaseList();
 #ifdef LEMON_OS_WIN32
-        QFile file(Settings::selfTestPath() + taskList[i]->getProblemTile() + QDir::separator() + "check.bat");
-        if (! file.open(QFile::WriteOnly | QFile::Text)) {
+        QFile file(Settings::selfTestPath() + taskList[i]->getProblemTile() + QDir::separator()
+                   + "check.bat");
+        if (!file.open(QFile::WriteOnly | QFile::Text)) {
             QApplication::restoreOverrideCursor();
-            QMessageBox::warning(widget, tr("Lemon"), tr("Cannot write check.bat"), QMessageBox::Ok);
+            QMessageBox::warning(widget, tr("Lemon"), tr("Cannot write check.bat"),
+                                 QMessageBox::Ok);
             return;
         }
-        QFile dummy(Settings::selfTestPath() + taskList[i]->getProblemTile() + QDir::separator() + "enter");
-        if (! dummy.open(QFile::WriteOnly | QFile::Text)) {
+        QFile dummy(Settings::selfTestPath() + taskList[i]->getProblemTile() + QDir::separator()
+                    + "enter");
+        if (!dummy.open(QFile::WriteOnly | QFile::Text)) {
             QApplication::restoreOverrideCursor();
             QMessageBox::warning(widget, tr("Lemon"), tr("Cannot write enter"), QMessageBox::Ok);
             return;
@@ -82,8 +85,9 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
         dummy.close();
 #endif
 #ifdef LEMON_OS_UNIX
-        QFile file(Settings::selfTestPath() + taskList[i]->getProblemTile() + QDir::separator() + "check.sh");
-        if (! file.open(QFile::WriteOnly | QFile::Text)) {
+        QFile file(Settings::selfTestPath() + taskList[i]->getProblemTile() + QDir::separator()
+                   + "check.sh");
+        if (!file.open(QFile::WriteOnly | QFile::Text)) {
             QApplication::restoreOverrideCursor();
             QMessageBox::warning(widget, tr("Lemon"), tr("Cannot write check.sh"), QMessageBox::Ok);
             return;
@@ -98,37 +102,41 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
 #endif
         if (taskList[i]->getComparisonMode() == Task::RealNumberMode) {
 #ifdef LEMON_OS_WIN32
-            QFile::copy(":/judge/realjudge_win32.exe",
-                        Settings::selfTestPath() + taskList[i]->getProblemTile()
-                        + QDir::separator() + "realjudge.exe");
-            QProcess::execute(QString("attrib -R \"") + Settings::selfTestPath() + taskList[i]->getProblemTile()
-                              + QDir::separator() + "realjudge.exe" + "\"");
+            QFile::copy(QCoreApplication::applicationDirPath() + "/judge/realjudge_win32.exe",
+                        Settings::selfTestPath() + taskList[i]->getProblemTile() + QDir::separator()
+                            + "realjudge.exe");
+            QProcess::execute(QString("attrib -R \"") + Settings::selfTestPath()
+                              + taskList[i]->getProblemTile() + QDir::separator() + "realjudge.exe"
+                              + "\"");
 #endif
 #ifdef LEMON_OS_UNIX
-            QFile::copy(":/judge/realjudge_linux",
-                        Settings::selfTestPath() + taskList[i]->getProblemTile()
-                        + QDir::separator() + "realjudge");
-            QProcess::execute(QString("chmod +wx \"") + Settings::selfTestPath() + taskList[i]->getProblemTile()
-                              + QDir::separator() + "realjudge" + "\"");
+            QFile::copy(QCoreApplication::applicationDirPath() + "/judge/realjudge_linux",
+                        Settings::selfTestPath() + taskList[i]->getProblemTile() + QDir::separator()
+                            + "realjudge");
+            QProcess::execute(QString("chmod +wx \"") + Settings::selfTestPath()
+                              + taskList[i]->getProblemTile() + QDir::separator() + "realjudge"
+                              + "\"");
 #endif
         }
         if (taskList[i]->getComparisonMode() == Task::SpecialJudgeMode) {
-            if (! QFile::copy(Settings::dataPath() + taskList[i]->getSpecialJudge(),
-                              Settings::selfTestPath() + taskList[i]->getProblemTile() + QDir::separator()
-                              + QFileInfo(taskList[i]->getSpecialJudge()).fileName())) {
+            if (!QFile::copy(Settings::dataPath() + taskList[i]->getSpecialJudge(),
+                             Settings::selfTestPath() + taskList[i]->getProblemTile()
+                                 + QDir::separator()
+                                 + QFileInfo(taskList[i]->getSpecialJudge()).fileName())) {
                 QApplication::restoreOverrideCursor();
-                QMessageBox::warning(widget, tr("Lemon"),
-                                     tr("Cannot copy %1").arg(QFileInfo(taskList[i]->getSpecialJudge()).fileName()),
-                                     QMessageBox::Ok);
+                QMessageBox::warning(
+                    widget, tr("Lemon"),
+                    tr("Cannot copy %1").arg(QFileInfo(taskList[i]->getSpecialJudge()).fileName()),
+                    QMessageBox::Ok);
                 return;
             }
         }
         int index = 0;
-        for (int j = 0; j < testCaseList.size(); j ++) {
+        for (int j = 0; j < testCaseList.size(); j++) {
             QStringList inputFiles = testCaseList[j]->getInputFiles();
             QStringList outputFiles = testCaseList[j]->getOutputFiles();
-            for (int k = 0; k < inputFiles.size(); k ++) {
-                index ++;
+            for (int k = 0; k < inputFiles.size(); k++) {
+                index++;
                 QString inputFile, outputFile;
                 if (taskList[i]->getTaskType() == Task::Traditional) {
                     inputFile = taskList[i]->getSourceFileName();
@@ -139,28 +147,32 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
                     inputFile = QFileInfo(inputFiles[k]).fileName();
                     outputFile = QFileInfo(outputFiles[k]).fileName();
                 }
-                if (! QFile::copy(Settings::dataPath() + inputFiles[k],
-                                  Settings::selfTestPath() + taskList[i]->getProblemTile() + QDir::separator()
-                                  + inputFile)) {
+                if (!QFile::copy(Settings::dataPath() + inputFiles[k],
+                                 Settings::selfTestPath() + taskList[i]->getProblemTile()
+                                     + QDir::separator() + inputFile)) {
                     QApplication::restoreOverrideCursor();
-                    QMessageBox::warning(widget, tr("Lemon"),
-                                         tr("Cannot copy %1").arg(QFileInfo(inputFiles[k]).fileName()),
-                                         QMessageBox::Ok);
+                    QMessageBox::warning(
+                        widget, tr("Lemon"),
+                        tr("Cannot copy %1").arg(QFileInfo(inputFiles[k]).fileName()),
+                        QMessageBox::Ok);
                     return;
                 }
-                if (! QFile::copy(Settings::dataPath() + outputFiles[k],
-                                  Settings::selfTestPath() + taskList[i]->getProblemTile() + QDir::separator()
-                                  + outputFile)) {
+                if (!QFile::copy(Settings::dataPath() + outputFiles[k],
+                                 Settings::selfTestPath() + taskList[i]->getProblemTile()
+                                     + QDir::separator() + outputFile)) {
                     QApplication::restoreOverrideCursor();
-                    QMessageBox::warning(widget, tr("Lemon"),
-                                         tr("Cannot copy %1").arg(QFileInfo(outputFiles[k]).fileName()),
-                                         QMessageBox::Ok);
+                    QMessageBox::warning(
+                        widget, tr("Lemon"),
+                        tr("Cannot copy %1").arg(QFileInfo(outputFiles[k]).fileName()),
+                        QMessageBox::Ok);
                     return;
                 }
 #ifdef LEMON_OS_WIN32
-                if (! taskList[i]->getStandardInputCheck() && taskList[i]->getTaskType() == Task::Traditional) {
-                    out << QString("copy \"%1\" \"%2\" >nul").arg(inputFile,
-                                                                  taskList[i]->getInputFileName()) << endl;
+                if (!taskList[i]->getStandardInputCheck()
+                    && taskList[i]->getTaskType() == Task::Traditional) {
+                    out << QString("copy \"%1\" \"%2\" >nul")
+                               .arg(inputFile, taskList[i]->getInputFileName())
+                        << endl;
                 }
                 out << QString("echo Test Case: %1").arg(index) << endl;
                 if (taskList[i]->getTaskType() == Task::Traditional) {
@@ -184,40 +196,42 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
                     }
                 } else {
                     outputFileName = QFileInfo(inputFiles[k]).completeBaseName() + "."
-                                     + taskList[i]->getAnswerFileExtension();
+                        + taskList[i]->getAnswerFileExtension();
                 }
                 if (taskList[i]->getComparisonMode() == Task::LineByLineMode) {
-                    out << QString("fc \"%1\" \"%2\"")
-                           .arg(outputFileName, outputFile) << endl;
+                    out << QString("fc \"%1\" \"%2\"").arg(outputFileName, outputFile) << endl;
                 }
                 if (taskList[i]->getComparisonMode() == Task::IgnoreSpacesMode) {
-                    out << QString("fc \"%1\" \"%2\" /W")
-                           .arg(outputFileName, outputFile) << endl;
+                    out << QString("fc \"%1\" \"%2\" /W").arg(outputFileName, outputFile) << endl;
                 }
                 if (taskList[i]->getComparisonMode() == Task::ExternalToolMode) {
-                    out << QString("fc \"%1\" \"%2\"")
-                           .arg(outputFileName, outputFile) << endl;
+                    out << QString("fc \"%1\" \"%2\"").arg(outputFileName, outputFile) << endl;
                 }
                 if (taskList[i]->getComparisonMode() == Task::RealNumberMode) {
                     out << QString("realjudge.exe \"%1\" \"%2\" \"%3\"")
-                           .arg(outputFileName).arg(outputFile).arg(taskList[i]->getRealPrecision()) << endl;
+                               .arg(outputFileName)
+                               .arg(outputFile)
+                               .arg(taskList[i]->getRealPrecision())
+                        << endl;
                 }
                 if (taskList[i]->getComparisonMode() == Task::SpecialJudgeMode) {
                     out << QString("\"%1\" \"%2\" \"%3\" \"%4\" \"%5\" \"%6\" \"%7\"")
-                           .arg(QFileInfo(taskList[i]->getSpecialJudge()).fileName(),
-                                inputFile, outputFileName, outputFile,
-                                QString("%1").arg(testCaseList[j]->getFullScore()),
-                                "_score", "_message") << endl;
+                               .arg(QFileInfo(taskList[i]->getSpecialJudge()).fileName(), inputFile,
+                                    outputFileName, outputFile,
+                                    QString("%1").arg(testCaseList[j]->getFullScore()), "_score",
+                                    "_message")
+                        << endl;
                     out << "echo Your score:" << endl << "type _score" << endl;
                     out << "if exist _message (" << endl;
                     out << "echo Message:" << endl << "type _message" << endl << ")" << endl;
                 }
                 out << "pause" << endl;
-                if (! taskList[i]->getStandardInputCheck() && taskList[i]->getTaskType() == Task::Traditional) {
+                if (!taskList[i]->getStandardInputCheck()
+                    && taskList[i]->getTaskType() == Task::Traditional) {
                     out << QString("del \"%1\"").arg(taskList[i]->getInputFileName()) << endl;
                 }
                 if (taskList[i]->getTaskType() == Task::Traditional) {
-                    if (! taskList[i]->getStandardOutputCheck()) {
+                    if (!taskList[i]->getStandardOutputCheck()) {
                         out << QString("del \"%1\"").arg(taskList[i]->getOutputFileName()) << endl;
                     } else {
                         out << "del _tmpout" << endl;
@@ -229,9 +243,10 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
                 out << "echo." << endl << endl;
 #endif
 #ifdef LEMON_OS_UNIX
-                if (! taskList[i]->getStandardInputCheck() && taskList[i]->getTaskType() == Task::Traditional) {
-                    out << QString("cp %1 %2").arg(inputFile,
-                                                   taskList[i]->getInputFileName()) << endl;
+                if (!taskList[i]->getStandardInputCheck()
+                    && taskList[i]->getTaskType() == Task::Traditional) {
+                    out << QString("cp %1 %2").arg(inputFile, taskList[i]->getInputFileName())
+                        << endl;
                 }
                 out << QString("echo \"Test Case: %1\"").arg(index) << endl;
                 if (taskList[i]->getTaskType() == Task::Traditional) {
@@ -253,7 +268,7 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
                     }
                 } else {
                     outputFileName = QFileInfo(inputFiles[k]).completeBaseName() + "."
-                                     + taskList[i]->getAnswerFileExtension();
+                        + taskList[i]->getAnswerFileExtension();
                 }
                 if (taskList[i]->getComparisonMode() == Task::LineByLineMode) {
                     QString arg = QString("\"%1\" \"%2\"").arg(outputFileName, outputFile);
@@ -266,8 +281,11 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
                 }
                 if (taskList[i]->getComparisonMode() == Task::IgnoreSpacesMode) {
                     QString arg = QString(" \"%1\" \"%2\"").arg(outputFileName, outputFile);
-                    out << "if ! diff" << " --strip-trailing-cr -q --ignore-space-change" << arg << ";then" << endl;
-                    out << "diff" << " --strip-trailing-cr -y --ignore-space-change" << arg << endl;
+                    out << "if ! diff"
+                        << " --strip-trailing-cr -q --ignore-space-change" << arg << ";then"
+                        << endl;
+                    out << "diff"
+                        << " --strip-trailing-cr -y --ignore-space-change" << arg << endl;
                     out << QString("echo \"Wrong answer\"") << endl;
                     out << "else" << endl;
                     out << QString("echo \"Correct answer\"") << endl;
@@ -275,7 +293,8 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
                 }
                 if (taskList[i]->getComparisonMode() == Task::ExternalToolMode) {
                     QString arg = QString(" \"%1\" \"%2\"").arg(outputFileName, outputFile);
-                    out << "if ! diff " << taskList[i]->getDiffArguments() << arg << ";then" << endl;
+                    out << "if ! diff " << taskList[i]->getDiffArguments() << arg << ";then"
+                        << endl;
                     out << "diff " << taskList[i]->getDiffArguments() << arg << endl;
                     out << QString("echo \"Wrong answer\"") << endl;
                     out << "else" << endl;
@@ -284,24 +303,29 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
                 }
                 if (taskList[i]->getComparisonMode() == Task::RealNumberMode) {
                     out << QString("./realjudge \"%1\" \"%2\" \"%3\"")
-                           .arg(outputFileName).arg(outputFile).arg(taskList[i]->getRealPrecision()) << endl;
+                               .arg(outputFileName)
+                               .arg(outputFile)
+                               .arg(taskList[i]->getRealPrecision())
+                        << endl;
                 }
                 if (taskList[i]->getComparisonMode() == Task::SpecialJudgeMode) {
                     out << QString("./%1 \"%2\" \"%3\" \"%4\" \"%5\" \"%6\" \"%7\"")
-                           .arg(QFileInfo(taskList[i]->getSpecialJudge()).fileName(),
-                                inputFile, outputFileName, outputFile,
-                                QString("%1").arg(testCaseList[j]->getFullScore()),
-                                "_score", "_message") << endl;
+                               .arg(QFileInfo(taskList[i]->getSpecialJudge()).fileName(), inputFile,
+                                    outputFileName, outputFile,
+                                    QString("%1").arg(testCaseList[j]->getFullScore()), "_score",
+                                    "_message")
+                        << endl;
                     out << "echo \"Your score:\"" << endl << "cat _score" << endl;
                     out << "if [ -e _message ];then" << endl;
                     out << "echo \"Message:\"" << endl << "cat _message" << endl << "fi" << endl;
                 }
                 out << "read -n1 -p \"Press enter to continue...\"" << endl;
-                if (! taskList[i]->getStandardInputCheck() && taskList[i]->getTaskType() == Task::Traditional) {
+                if (!taskList[i]->getStandardInputCheck()
+                    && taskList[i]->getTaskType() == Task::Traditional) {
                     out << QString("rm \"%1\"").arg(taskList[i]->getInputFileName()) << endl;
                 }
                 if (taskList[i]->getTaskType() == Task::Traditional) {
-                    if (! taskList[i]->getStandardOutputCheck()) {
+                    if (!taskList[i]->getStandardOutputCheck()) {
                         out << QString("rm \"%1\"").arg(taskList[i]->getOutputFileName()) << endl;
                     } else {
                         out << "rm _tmpout" << endl;
@@ -316,11 +340,12 @@ void SelfTestUtil::makeSelfTest(QWidget *widget, Contest *contest)
         }
         file.close();
 #ifdef LEMON_OS_UNIX
-        QProcess::execute(QString("chmod +x \"") + Settings::selfTestPath() + taskList[i]->getProblemTile()
-                          + QDir::separator() + "check.sh" + "\"");
+        QProcess::execute(QString("chmod +x \"") + Settings::selfTestPath()
+                          + taskList[i]->getProblemTile() + QDir::separator() + "check.sh" + "\"");
 #endif
     }
-    
+
     QApplication::restoreOverrideCursor();
-    QMessageBox::information(widget, tr("Lemon"), tr("Self-test folder has been made"), QMessageBox::Ok);
+    QMessageBox::information(widget, tr("Lemon"), tr("Self-test folder has been made"),
+                             QMessageBox::Ok);
 }

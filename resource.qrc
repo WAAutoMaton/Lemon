@@ -11,11 +11,4 @@
         <file>Lemon_zh_CN.qm</file>
         <file>qt_zh_CN.qm</file>
     </qresource>
-    <qresource prefix="/judge">
-        <file>realjudge_win32.exe</file>
-        <file>realjudge_linux</file>
-    </qresource>
-    <qresource prefix="/watcher">
-        <file>watcher_unix</file>
-    </qresource>
 </RCC>

@@ -37,5 +37,5 @@ Makefile*
 # QtCtreator CMake
 CMakeLists.txt.user*
 
-# Lemon
-watcher_unix
+#Lemon
+Lemon_zh_CN.qm
