@@ -2,5 +2,11 @@
 A tiny judging environment for OI contest.
 
 # Compile
-1. Install `qt5` develop environment.
-2. `./make`
+Install `qt5` develop environment.
+
+```shell
+lrelease -verbose Lemon_zh_CN.ts Lemon_zh_CN.qm
+qmake lemon.pro
+make
+```
+
