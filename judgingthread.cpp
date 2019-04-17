@@ -824,9 +824,10 @@ void JudgingThread::runProgram()
 #endif
 
 #ifdef LEMON_OS_UNIX
-    bool ok = QFile::copy(QCoreApplication::applicationDirPath() + "/watcher/watcher_unix",
-                          workingDirectory + "watcher");
-    QProcess::execute(QString("chmod +wx \"") + workingDirectory + "watcher" + "\"");
+    // bool ok = QFile::copy(QCoreApplication::applicationDirPath() + "/watcher/watcher_unix",
+    //                      workingDirectory + "watcher");
+    QProcess::execute(QString(R"(chmod +wx "%1/watcher/watcher_unix")")
+                          .arg(QCoreApplication::applicationDirPath()));
 
     QProcess *runner = new QProcess(this);
     QStringList argumentsList;
@@ -846,7 +847,7 @@ void JudgingThread::runProgram()
     argumentsList << QString("%1").arg(memoryLimit);
     runner->setProcessEnvironment(environment);
     runner->setWorkingDirectory(workingDirectory);
-    runner->start(workingDirectory + "watcher", argumentsList);
+    runner->start(QCoreApplication::applicationDirPath() + "/watcher/watcher_unix", argumentsList);
     if (!runner->waitForStarted(-1)) {
         delete runner;
         score = 0;
