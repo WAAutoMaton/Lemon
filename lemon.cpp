@@ -2,6 +2,7 @@
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
     Copyright (C) 2016 Menci
+    Copyright (C) 2019 WAAutoMaton
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,91 +36,71 @@
 #include "selftestutil.h"
 #include "exportutil.h"
 
-Lemon::Lemon(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::Lemon)
+Lemon::Lemon(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::Lemon)
 {
     ui->setupUi(this);
-    
+
     curContest = 0;
     settings = new Settings(this);
-    
+
     ui->tabWidget->setVisible(false);
     ui->closeAction->setEnabled(false);
-    
+
     dataDirWatcher = 0;
     settings->loadSettings();
-    
+
     ui->summary->setSettings(settings);
     ui->taskEdit->setSettings(settings);
     ui->testCaseEdit->setSettings(settings);
-    
-    connect(this, SIGNAL(dataPathChanged()),
-            ui->taskEdit, SIGNAL(dataPathChanged()));
-    connect(this, SIGNAL(dataPathChanged()),
-            ui->testCaseEdit, SIGNAL(dataPathChanged()));
-    
-    connect(ui->summary, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)),
-            this, SLOT(summarySelectionChanged()));
-    connect(ui->optionsAction, SIGNAL(triggered()),
-            this, SLOT(showOptionsDialog()));
-    connect(ui->refreshButton, SIGNAL(clicked()),
-            this, SLOT(refreshButtonClicked()));
-    connect(ui->judgeButton, SIGNAL(clicked()),
-            ui->resultViewer, SLOT(judgeSelected()));
-    connect(ui->judgeAllButton, SIGNAL(clicked()),
-            ui->resultViewer, SLOT(judgeAll()));
-    connect(ui->judgeAction, SIGNAL(triggered()),
-            ui->resultViewer, SLOT(judgeSelected()));
-    connect(ui->judgeAllAction, SIGNAL(triggered()),
-            ui->resultViewer, SLOT(judgeAll()));
-    connect(ui->tabWidget, SIGNAL(currentChanged(int)),
-            this, SLOT(tabIndexChanged(int)));
-    connect(ui->resultViewer, SIGNAL(itemSelectionChanged()),
-            this, SLOT(viewerSelectionChanged()));
-    connect(ui->resultViewer, SIGNAL(contestantDeleted()),
-            this, SLOT(contestantDeleted()));
-    connect(ui->newAction, SIGNAL(triggered()),
-            this, SLOT(newAction()));
-    connect(ui->openAction, SIGNAL(triggered()),
-            this, SLOT(loadAction()));
-    connect(ui->closeAction, SIGNAL(triggered()),
-            this, SLOT(closeAction()));
-    connect(ui->addTasksAction, SIGNAL(triggered()),
-            this, SLOT(addTasksAction()));
-    connect(ui->makeSelfTestAction, SIGNAL(triggered()),
-            this, SLOT(makeSelfTest()));
-    connect(ui->exportAction, SIGNAL(triggered()),
-            this, SLOT(exportResult()));
-    connect(ui->aboutAction, SIGNAL(triggered()),
-            this, SLOT(aboutLemon()));
-    connect(ui->exitAction, SIGNAL(triggered()),
-            this, SLOT(close()));
-    
+
+    connect(this, SIGNAL(dataPathChanged()), ui->taskEdit, SIGNAL(dataPathChanged()));
+    connect(this, SIGNAL(dataPathChanged()), ui->testCaseEdit, SIGNAL(dataPathChanged()));
+
+    connect(ui->summary, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this,
+            SLOT(summarySelectionChanged()));
+    connect(ui->optionsAction, SIGNAL(triggered()), this, SLOT(showOptionsDialog()));
+    connect(ui->refreshButton, SIGNAL(clicked()), this, SLOT(refreshButtonClicked()));
+    connect(ui->judgeButton, SIGNAL(clicked()), ui->resultViewer, SLOT(judgeSelected()));
+    connect(ui->judgeAllButton, SIGNAL(clicked()), ui->resultViewer, SLOT(judgeAll()));
+    connect(ui->judgeAction, SIGNAL(triggered()), ui->resultViewer, SLOT(judgeSelected()));
+    connect(ui->judgeAllAction, SIGNAL(triggered()), ui->resultViewer, SLOT(judgeAll()));
+    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabIndexChanged(int)));
+    connect(ui->resultViewer, SIGNAL(itemSelectionChanged()), this, SLOT(viewerSelectionChanged()));
+    connect(ui->resultViewer, SIGNAL(contestantDeleted()), this, SLOT(contestantDeleted()));
+    connect(ui->newAction, SIGNAL(triggered()), this, SLOT(newAction()));
+    connect(ui->openAction, SIGNAL(triggered()), this, SLOT(loadAction()));
+    connect(ui->closeAction, SIGNAL(triggered()), this, SLOT(closeAction()));
+    connect(ui->addTasksAction, SIGNAL(triggered()), this, SLOT(addTasksAction()));
+    connect(ui->makeSelfTestAction, SIGNAL(triggered()), this, SLOT(makeSelfTest()));
+    connect(ui->exportAction, SIGNAL(triggered()), this, SLOT(exportResult()));
+    connect(ui->aboutAction, SIGNAL(triggered()), this, SLOT(aboutLemon()));
+    connect(ui->exitAction, SIGNAL(triggered()), this, SLOT(close()));
+
     appTranslator = new QTranslator(this);
     qtTranslator = new QTranslator(this);
     QApplication::installTranslator(appTranslator);
     QApplication::installTranslator(qtTranslator);
-    
-    QStringList fileList = QDir(":/translation").entryList(QStringList() << "Lemon_*.qm", QDir::Files);
-    for (int i = 0; i < fileList.size(); i ++) {
+
+    QStringList fileList =
+        QDir(":/translation").entryList(QStringList() << "Lemon_*.qm", QDir::Files);
+    for (int i = 0; i < fileList.size(); i++) {
         appTranslator->load(QString(":/translation/%1").arg(fileList[i]));
         QAction *newLanguage = new QAction(appTranslator->translate("Lemon", "English"), this);
         newLanguage->setCheckable(true);
         QString language = QFileInfo(fileList[i]).baseName();
         language.remove(0, language.indexOf('_') + 1);
         newLanguage->setData(language);
-        connect(newLanguage, SIGNAL(triggered()),
-                this, SLOT(setUiLanguage()));
+        connect(newLanguage, SIGNAL(triggered()), this, SLOT(setUiLanguage()));
         languageActions.append(newLanguage);
     }
     ui->languageMenu->addActions(languageActions);
     ui->setEnglishAction->setData("en");
     ui->setEnglishAction->setCheckable(true);
-    connect(ui->setEnglishAction, SIGNAL(triggered()),
-            this, SLOT(setUiLanguage()));
+    connect(ui->setEnglishAction, SIGNAL(triggered()), this, SLOT(setUiLanguage()));
     loadUiLanguage();
-    
+
     QSettings settings("Crash", "Lemon");
     QSize _size = settings.value("WindowSize", size()).toSize();
     resize(_size);
@@ -140,7 +121,8 @@ void Lemon::changeEvent(QEvent *event)
 
 void Lemon::closeEvent(QCloseEvent *event)
 {
-    if (curContest) saveContest(curFile);
+    if (curContest)
+        saveContest(curFile);
     settings->saveSettings();
     QSettings settings("Crash", "Lemon");
     settings.setValue("WindowSize", size());
@@ -151,13 +133,13 @@ void Lemon::welcome()
     if (settings->getCompilerList().size() == 0) {
         AddCompilerWizard *wizard = new AddCompilerWizard(this);
         if (wizard->exec() == QDialog::Accepted) {
-            QList<Compiler*> compilerList = wizard->getCompilerList();
-            for (int i = 0; i < compilerList.size(); i ++)
+            QList<Compiler *> compilerList = wizard->getCompilerList();
+            for (int i = 0; i < compilerList.size(); i++)
                 settings->addCompiler(compilerList[i]);
         }
         delete wizard;
     }
-    
+
     WelcomeDialog *dialog = new WelcomeDialog(this);
     dialog->setRecentContest(settings->getRecentContest());
     if (dialog->exec() == QDialog::Accepted) {
@@ -165,7 +147,8 @@ void Lemon::welcome()
         if (dialog->getCurrentTab() == 0) {
             loadContest(dialog->getSelectedContest());
         } else {
-            newContest(dialog->getContestTitle(), dialog->getSavingName(), dialog->getContestPath());
+            newContest(dialog->getContestTitle(), dialog->getSavingName(),
+                       dialog->getContestPath());
         }
     } else {
         settings->setRecentContest(dialog->getRecentContest());
@@ -176,13 +159,14 @@ void Lemon::welcome()
 void Lemon::loadUiLanguage()
 {
     ui->setEnglishAction->setChecked(false);
-    for (int i = 0; i < languageActions.size(); i ++) {
+    for (int i = 0; i < languageActions.size(); i++) {
         languageActions[i]->setChecked(false);
     }
-    for (int i = 0; i < languageActions.size(); i ++) {
+    for (int i = 0; i < languageActions.size(); i++) {
         if (languageActions[i]->data().toString() == settings->getUiLanguage()) {
             languageActions[i]->setChecked(true);
-            appTranslator->load(QString(":/translation/Lemon_%1.qm").arg(settings->getUiLanguage()));
+            appTranslator->load(
+                QString(":/translation/Lemon_%1.qm").arg(settings->getUiLanguage()));
             qtTranslator->load(QString(":/translation/qt_%1.qm").arg(settings->getUiLanguage()));
             return;
         }
@@ -198,36 +182,35 @@ void Lemon::insertWatchPath(const QString &curDir, QFileSystemWatcher *watcher)
     watcher->addPath(curDir);
     QDir dir(curDir);
     QStringList list = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
-    for (int i = 0; i < list.size(); i ++) {
+    for (int i = 0; i < list.size(); i++) {
         insertWatchPath(curDir + list[i] + QDir::separator(), watcher);
     }
 }
 
 void Lemon::resetDataWatcher()
 {
-    if (dataDirWatcher) delete dataDirWatcher;
+    if (dataDirWatcher)
+        delete dataDirWatcher;
     dataDirWatcher = new QFileSystemWatcher(this);
     insertWatchPath(Settings::dataPath(), dataDirWatcher);
-    connect(dataDirWatcher, SIGNAL(directoryChanged(QString)),
-            this, SLOT(resetDataWatcher()));
-    connect(dataDirWatcher, SIGNAL(fileChanged(QString)),
-            this, SIGNAL(dataPathChanged()));
-    connect(dataDirWatcher, SIGNAL(directoryChanged(QString)),
-            this, SIGNAL(dataPathChanged()));
+    connect(dataDirWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(resetDataWatcher()));
+    connect(dataDirWatcher, SIGNAL(fileChanged(QString)), this, SIGNAL(dataPathChanged()));
+    connect(dataDirWatcher, SIGNAL(directoryChanged(QString)), this, SIGNAL(dataPathChanged()));
     emit dataPathChanged();
 }
 
 void Lemon::summarySelectionChanged()
 {
-    if (! ui->summary->isEnabled()) return;
-    
+    if (!ui->summary->isEnabled())
+        return;
+
     QTreeWidgetItem *curItem = ui->summary->currentItem();
-    if (! curItem) {
+    if (!curItem) {
         ui->taskEdit->setEditTask(0);
         ui->editWidget->setCurrentIndex(0);
         return;
     }
-    
+
     int index = ui->summary->indexOfTopLevelItem(curItem);
     if (index != -1) {
         ui->taskEdit->setEditTask(curContest->getTask(index));
@@ -251,8 +234,8 @@ void Lemon::showOptionsDialog()
         settings->copyFrom(dialog->getEditSettings());
         ui->testCaseEdit->setSettings(settings);
         if (curContest) {
-            const QList<Task*> &taskList = curContest->getTaskList();
-            for (int i = 0; i < taskList.size(); i ++)
+            const QList<Task *> &taskList = curContest->getTaskList();
+            for (int i = 0; i < taskList.size(); i++)
                 taskList[i]->refreshCompilerConfiguration(settings);
         }
     }
@@ -324,14 +307,14 @@ void Lemon::contestantDeleted()
 void Lemon::saveContest(const QString &fileName)
 {
     QFile file(fileName);
-    if (! file.open(QFile::WriteOnly)) {
+    if (!file.open(QFile::WriteOnly)) {
         QMessageBox::warning(this, tr("Error"), tr("Cannot open file %1").arg(fileName),
                              QMessageBox::Close);
         return;
     }
-    
+
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    
+
     QByteArray data;
     QDataStream _out(&data, QIODevice::WriteOnly);
     curContest->writeToStream(_out);
@@ -339,53 +322,57 @@ void Lemon::saveContest(const QString &fileName)
     QDataStream out(&file);
     out << unsigned(MagicNumber) << qChecksum(data.data(), data.length()) << data.length();
     out.writeRawData(data.data(), data.length());
-    
+
     QApplication::restoreOverrideCursor();
 }
 
 void Lemon::loadContest(const QString &filePath)
 {
-    if (curContest) closeAction();
-    
+    if (curContest)
+        closeAction();
+
     QFile file(filePath);
-    if (! file.open(QFile::ReadOnly)) {
-        QMessageBox::warning(this, tr("Error"), tr("Cannot open file %1").arg(QFileInfo(filePath).fileName()),
+    if (!file.open(QFile::ReadOnly)) {
+        QMessageBox::warning(this, tr("Error"),
+                             tr("Cannot open file %1").arg(QFileInfo(filePath).fileName()),
                              QMessageBox::Close);
         return;
     }
-    
+
     QDataStream _in(&file);
     unsigned checkNumber;
     _in >> checkNumber;
     if (checkNumber != unsigned(MagicNumber)) {
-        QMessageBox::warning(this, tr("Error"), tr("File %1 is broken").arg(QFileInfo(filePath).fileName()),
+        QMessageBox::warning(this, tr("Error"),
+                             tr("File %1 is broken").arg(QFileInfo(filePath).fileName()),
                              QMessageBox::Close);
         return;
     }
-    
+
     quint16 checksum;
     int len;
     _in >> checksum >> len;
     char *raw = new char[len];
     _in.readRawData(raw, len);
     if (qChecksum(raw, len) != checksum) {
-        QMessageBox::warning(this, tr("Error"), tr("File %1 is broken").arg(QFileInfo(filePath).fileName()),
+        QMessageBox::warning(this, tr("Error"),
+                             tr("File %1 is broken").arg(QFileInfo(filePath).fileName()),
                              QMessageBox::Close);
         delete[] raw;
         return;
     }
-    
+
     QByteArray data(raw, len);
     delete[] raw;
     data = qUncompress(data);
     QDataStream in(data);
-    
+
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    
+
     curContest = new Contest(this);
     curContest->setSettings(settings);
     curContest->readFromStream(in);
-    
+
     curFile = QFileInfo(filePath).fileName();
     QDir::setCurrent(QFileInfo(filePath).path());
     QDir().mkdir(Settings::dataPath());
@@ -400,20 +387,20 @@ void Lemon::loadContest(const QString &filePath)
     ui->makeSelfTestAction->setEnabled(true);
     ui->exportAction->setEnabled(true);
     setWindowTitle(tr("Lemon - %1").arg(curContest->getContestTitle()));
-    
+
     QApplication::restoreOverrideCursor();
     ui->tabWidget->setCurrentIndex(0);
 }
 
 void Lemon::newContest(const QString &title, const QString &savingName, const QString &path)
 {
-    if (! QDir(path).exists() && ! QDir().mkpath(path)) {
-        QMessageBox::warning(this, tr("Error"), tr("Cannot make contest path"),
-                             QMessageBox::Close);
+    if (!QDir(path).exists() && !QDir().mkpath(path)) {
+        QMessageBox::warning(this, tr("Error"), tr("Cannot make contest path"), QMessageBox::Close);
         return;
     }
-    
-    if (curContest) closeAction();
+
+    if (curContest)
+        closeAction();
     curContest = new Contest(this);
     curContest->setSettings(settings);
     curContest->setContestTitle(title);
@@ -471,7 +458,7 @@ void Lemon::loadAction()
     QStringList recentContest = dialog->getRecentContest();
     if (dialog->exec() == QDialog::Accepted) {
         QString selectedContest = dialog->getSelectedContest();
-        for (int i = 0; i < recentContest.size(); i ++) {
+        for (int i = 0; i < recentContest.size(); i++) {
             if (recentContest[i] == selectedContest) {
                 recentContest.removeAt(i);
                 break;
@@ -487,14 +474,15 @@ void Lemon::loadAction()
 void Lemon::getFiles(const QString &path, const QStringList &filters, QMap<QString, QString> &files)
 {
     QDir dir(path);
-    if (! filters.isEmpty()) dir.setNameFilters(filters);
+    if (!filters.isEmpty())
+        dir.setNameFilters(filters);
     QFileInfoList list = dir.entryInfoList(QDir::Files);
-    for (int i = 0; i < list.size(); i ++) {
+    for (int i = 0; i < list.size(); i++) {
         files.insert(list[i].completeBaseName(), list[i].fileName());
     }
 }
 
-void Lemon::addTask(const QString &title, const QList<QPair<QString, QString> > &testCases,
+void Lemon::addTask(const QString &title, const QList<QPair<QString, QString>> &testCases,
                     int fullScore, int timeLimit, int memoryLimit)
 {
     Task *newTask = new Task;
@@ -505,7 +493,7 @@ void Lemon::addTask(const QString &title, const QList<QPair<QString, QString> > 
     newTask->refreshCompilerConfiguration(settings);
     newTask->setAnswerFileExtension(settings->getDefaultOutputFileExtension());
     curContest->addTask(newTask);
-    for (int i = 0; i < testCases.size(); i ++) {
+    for (int i = 0; i < testCases.size(); i++) {
         TestCase *newTestCase = new TestCase;
         newTestCase->setFullScore(fullScore);
         newTestCase->setTimeLimit(timeLimit);
@@ -519,73 +507,79 @@ void Lemon::addTask(const QString &title, const QList<QPair<QString, QString> > 
 bool Lemon::compareFileName(const QPair<QString, QString> &a, const QPair<QString, QString> &b)
 {
     return a.first.length() < b.first.length()
-            || (a.first.length() == b.first.length() && QString::localeAwareCompare(a.first, b.first) < 0);
+        || (a.first.length() == b.first.length()
+            && QString::localeAwareCompare(a.first, b.first) < 0);
 }
 
 void Lemon::addTasksAction()
 {
     QStringList list = QDir(Settings::dataPath()).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
     QSet<QString> nameSet;
-    QList<Task*> taskList = curContest->getTaskList();
-    for (int i = 0; i < taskList.size(); i ++) {
+    QList<Task *> taskList = curContest->getTaskList();
+    for (int i = 0; i < taskList.size(); i++) {
         nameSet.insert(taskList[i]->getSourceFileName());
     }
     QStringList nameList;
-    QList< QList< QPair<QString, QString> > > testCases;
-    for (int i = 0; i < list.size(); i ++) {
-        if (! nameSet.contains(list[i])) {
+    QList<QList<QPair<QString, QString>>> testCases;
+    for (int i = 0; i < list.size(); i++) {
+        if (!nameSet.contains(list[i])) {
             QStringList filters;
             filters = settings->getInputFileExtensions();
-            if (filters.isEmpty()) filters << "in";
-            for (int j = 0; j < filters.size(); j ++) {
+            if (filters.isEmpty())
+                filters << "in";
+            for (int j = 0; j < filters.size(); j++) {
                 filters[j] = QString("*.") + filters[j];
             }
             QMap<QString, QString> inputFiles;
             getFiles(Settings::dataPath() + list[i], filters, inputFiles);
-            
+
             filters = settings->getOutputFileExtensions();
-            if (filters.isEmpty()) filters << "out" << "ans";
-            for (int j = 0; j < filters.size(); j ++) {
+            if (filters.isEmpty())
+                filters << "out"
+                        << "ans";
+            for (int j = 0; j < filters.size(); j++) {
                 filters[j] = QString("*.") + filters[j];
             }
             QMap<QString, QString> outputFiles;
             getFiles(Settings::dataPath() + list[i], filters, outputFiles);
-            
-            QList< QPair<QString, QString> > cases;
+
+            QList<QPair<QString, QString>> cases;
             QStringList baseNameList = inputFiles.keys();
-            for (int j = 0; j < baseNameList.size(); j ++) {
+            for (int j = 0; j < baseNameList.size(); j++) {
                 if (outputFiles.contains(baseNameList[j])) {
-                    cases.append(qMakePair(inputFiles[baseNameList[j]], outputFiles[baseNameList[j]]));
+                    cases.append(
+                        qMakePair(inputFiles[baseNameList[j]], outputFiles[baseNameList[j]]));
                 }
             }
-            
+
             qSort(cases.begin(), cases.end(), compareFileName);
-            if (! cases.isEmpty()) {
+            if (!cases.isEmpty()) {
                 nameList.append(list[i]);
                 testCases.append(cases);
             }
         }
     }
-    
+
     if (nameList.isEmpty()) {
         QMessageBox::warning(this, tr("Lemon"), tr("No task found"), QMessageBox::Ok);
         return;
     }
-    
+
     AddTaskDialog *dialog = new AddTaskDialog(this);
     dialog->resize(dialog->sizeHint());
     dialog->setMaximumSize(dialog->sizeHint());
     dialog->setMinimumSize(dialog->sizeHint());
-    for (int i = 0; i < nameList.size(); i ++) {
-        dialog->addTask(nameList[i], 100, settings->getDefaultTimeLimit(), settings->getDefaultMemoryLimit());
+    for (int i = 0; i < nameList.size(); i++) {
+        dialog->addTask(nameList[i], 100, settings->getDefaultTimeLimit(),
+                        settings->getDefaultMemoryLimit());
     }
     if (dialog->exec() == QDialog::Accepted) {
-        for (int i = 0; i < nameList.size(); i ++) {
+        for (int i = 0; i < nameList.size(); i++) {
             addTask(nameList[i], testCases[i], dialog->getFullScore(i) / testCases[i].size(),
                     dialog->getTimeLimit(i), dialog->getMemoryLimit(i));
         }
     }
-    
+
     ui->summary->setContest(curContest);
 }
 
@@ -606,17 +600,21 @@ void Lemon::aboutLemon()
     text += tr("A tiny judging environment for OI contest") + "<br>";
     text += tr("Version 1.3 Beta") + "<br>";
     text += tr("Build Date: %1").arg(__DATE__) + "<br>";
-    text += tr("Copyright (c) 2011 <a href=\"http://hi.baidu.com/oimaster\">Zhipeng Jia</a>") + "<br>";
+    text +=
+        tr("Copyright (c) 2011 <a href=\"http://hi.baidu.com/oimaster\">Zhipeng Jia</a>") + "<br>";
     text += tr("Copyright (c) 2016 <a href=\"https://menci.moe/\">Menci</a>") + "<br>";
-    text += tr("This program is under the <a href=\"http://www.gnu.org/licenses/gpl-3.0.html\">GPLv3</a> license")
-            + "<br><br>";
-    text += QString("<a href=\"https://github.com/OpenOI/Lemon\">") + tr("GitHub Page") + "</a>";
+    text += tr("Copyright (c) 2019 <a href=\"https://wa-am.com/\">WAAutoMaton</a>") + "<br>";
+    text += tr("This program is under the <a "
+               "href=\"http://www.gnu.org/licenses/gpl-3.0.html\">GPLv3</a> license")
+        + "<br><br>";
+    text +=
+        QString("<a href=\"https://github.com/WAAutoMaton/Lemon\">") + tr("GitHub Page") + "</a>";
     QMessageBox::about(this, tr("About Lemon"), text);
 }
 
 void Lemon::setUiLanguage()
 {
-    QAction *language = dynamic_cast<QAction*>(sender());
+    QAction *language = dynamic_cast<QAction *>(sender());
     settings->setUiLanguage(language->data().toString());
     loadUiLanguage();
 }

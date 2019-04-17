@@ -2,6 +2,7 @@
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
     Copyright (C) 2016 Menci
+    Copyright (C) 2019 WAAutoMaton
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +27,7 @@
 #include <QMessageBox>
 
 namespace Ui {
-    class Lemon;
+class Lemon;
 }
 
 class Contest;
@@ -40,8 +41,8 @@ class Lemon : public QMainWindow
 public:
     explicit Lemon(QWidget *parent = 0);
     ~Lemon();
-    void changeEvent(QEvent*);
-    void closeEvent(QCloseEvent*);
+    void changeEvent(QEvent *);
+    void closeEvent(QCloseEvent *);
     void welcome();
 
 private:
@@ -50,17 +51,17 @@ private:
     Settings *settings;
     QFileSystemWatcher *dataDirWatcher;
     QString curFile;
-    QList<QAction*> languageActions;
+    QList<QAction *> languageActions;
     QTranslator *appTranslator;
     QTranslator *qtTranslator;
     void loadUiLanguage();
-    void insertWatchPath(const QString&, QFileSystemWatcher*);
-    void newContest(const QString&, const QString&, const QString&);
-    void saveContest(const QString&);
-    void loadContest(const QString&);
-    void getFiles(const QString&, const QStringList&, QMap<QString, QString>&);
-    void addTask(const QString&, const QList< QPair<QString, QString> >&, int, int, int);
-    static bool compareFileName(const QPair<QString, QString>&, const QPair<QString, QString>&);
+    void insertWatchPath(const QString &, QFileSystemWatcher *);
+    void newContest(const QString &, const QString &, const QString &);
+    void saveContest(const QString &);
+    void loadContest(const QString &);
+    void getFiles(const QString &, const QStringList &, QMap<QString, QString> &);
+    void addTask(const QString &, const QList<QPair<QString, QString>> &, int, int, int);
+    static bool compareFileName(const QPair<QString, QString> &, const QPair<QString, QString> &);
 
 private slots:
     void summarySelectionChanged();

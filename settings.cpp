@@ -2,6 +2,7 @@
     This file is part of Project Lemon
     Copyright (C) 2011 Zhipeng Jia
     Copyright (C) 2016 Menci
+    Copyright (C) 2019 WAAutoMaton
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,8 +22,8 @@
 #include "settings.h"
 #include "compiler.h"
 
-Settings::Settings(QObject *parent) :
-    QObject(parent)
+Settings::Settings(QObject *parent)
+    : QObject(parent)
 {
 }
 
@@ -61,42 +62,42 @@ int Settings::getNumberOfThreads() const
     return numberOfThreads;
 }
 
-const QString& Settings::getDefaultInputFileExtension() const
+const QString &Settings::getDefaultInputFileExtension() const
 {
     return defaultInputFileExtension;
 }
 
-const QString& Settings::getDefaultOutputFileExtension() const
+const QString &Settings::getDefaultOutputFileExtension() const
 {
     return defaultOutputFileExtension;
 }
 
-const QStringList& Settings::getInputFileExtensions() const
+const QStringList &Settings::getInputFileExtensions() const
 {
     return inputFileExtensions;
 }
 
-const QStringList& Settings::getOutputFileExtensions() const
+const QStringList &Settings::getOutputFileExtensions() const
 {
     return outputFileExtensions;
 }
 
-const QStringList& Settings::getRecentContest() const
+const QStringList &Settings::getRecentContest() const
 {
     return recentContest;
 }
 
-const QList<Compiler*>& Settings::getCompilerList() const
+const QList<Compiler *> &Settings::getCompilerList() const
 {
     return compilerList;
 }
 
-const QString& Settings::getUiLanguage() const
+const QString &Settings::getUiLanguage() const
 {
     return uiLanguage;
 }
 
-const QString& Settings::getDiffPath() const
+const QString &Settings::getDiffPath() const
 {
     return diffPath;
 }
@@ -180,7 +181,7 @@ void Settings::deleteCompiler(int index)
     }
 }
 
-Compiler* Settings::getCompiler(int index)
+Compiler *Settings::getCompiler(int index)
 {
     if (0 <= index && index < compilerList.size()) {
         return compilerList[index];
@@ -211,13 +212,13 @@ void Settings::copyFrom(Settings *other)
     setDefaultOutputFileExtension(other->getDefaultOutputFileExtension());
     setInputFileExtensions(other->getInputFileExtensions().join(";"));
     setOutputFileExtensions(other->getOutputFileExtensions().join(";"));
-    
-    for (int i = 0; i < compilerList.size(); i ++) {
+
+    for (int i = 0; i < compilerList.size(); i++) {
         delete compilerList[i];
     }
     compilerList.clear();
-    const QList<Compiler*> &list = other->getCompilerList();
-    for (int i = 0; i < list.size(); i ++) {
+    const QList<Compiler *> &list = other->getCompilerList();
+    for (int i = 0; i < list.size(); i++) {
         Compiler *compiler = new Compiler;
         compiler->copyFrom(list[i]);
         addCompiler(compiler);
@@ -227,9 +228,9 @@ void Settings::copyFrom(Settings *other)
 void Settings::saveSettings()
 {
     QSettings settings("Crash", "Lemon");
-    
+
     settings.setValue("UiLanguage", uiLanguage);
-    
+
     settings.beginGroup("GeneralSettings");
     settings.setValue("DefaultFullScore", defaultFullScore);
     settings.setValue("DefaultTimeLimit", defaultTimeLimit);
@@ -243,9 +244,9 @@ void Settings::saveSettings()
     settings.setValue("InputFileExtensions", inputFileExtensions);
     settings.setValue("OutputFileExtensions", outputFileExtensions);
     settings.endGroup();
-    
+
     settings.beginWriteArray("v1.2/CompilerSettings");
-    for (int i = 0; i < compilerList.size(); i ++) {
+    for (int i = 0; i < compilerList.size(); i++) {
         settings.setArrayIndex(i);
         settings.setValue("CompilerType", (int)compilerList[i]->getCompilerType());
         settings.setValue("CompilerName", compilerList[i]->getCompilerName());
@@ -260,7 +261,7 @@ void Settings::saveSettings()
         QStringList compilerArguments = compilerList[i]->getCompilerArguments();
         QStringList interpreterArguments = compilerList[i]->getInterpreterArguments();
         settings.beginWriteArray("Configuration");
-        for (int j = 0; j < configurationNames.size(); j ++) {
+        for (int j = 0; j < configurationNames.size(); j++) {
             settings.setArrayIndex(j);
             settings.setValue("Name", configurationNames[j]);
             settings.setValue("CompilerArguments", compilerArguments[j]);
@@ -270,9 +271,9 @@ void Settings::saveSettings()
         settings.endArray();
     }
     settings.endArray();
-    
+
     settings.beginWriteArray("v1.2/RecentContest");
-    for (int i = 0; i < recentContest.size(); i ++) {
+    for (int i = 0; i < recentContest.size(); i++) {
         settings.setArrayIndex(i);
         settings.setValue("Location", recentContest[i]);
     }
@@ -281,15 +282,15 @@ void Settings::saveSettings()
 
 void Settings::loadSettings()
 {
-    for (int i = 0; i < compilerList.size(); i ++)
+    for (int i = 0; i < compilerList.size(); i++)
         delete compilerList[i];
     compilerList.clear();
     recentContest.clear();
-    
+
     QSettings settings("Crash", "Lemon");
-    
+
     uiLanguage = settings.value("UiLanguage", QLocale::system().name()).toString();
-    
+
     settings.beginGroup("GeneralSettings");
     defaultFullScore = settings.value("DefaultFullScore", 10).toInt();
     defaultTimeLimit = settings.value("DefaultTimeLimit", 1000).toInt();
@@ -300,12 +301,17 @@ void Settings::loadSettings()
     numberOfThreads = settings.value("NumberOfThreads", 1).toInt();
     defaultInputFileExtension = settings.value("DefaultInputFileExtension", "in").toString();
     defaultOutputFileExtension = settings.value("DefaultOuputFileExtension", "out").toString();
-    inputFileExtensions = settings.value("InputFileExtensions", QStringList() << "in").toStringList();
-    outputFileExtensions = settings.value("OutputFileExtensions", QStringList() << "out" << "ans").toStringList();
+    inputFileExtensions =
+        settings.value("InputFileExtensions", QStringList() << "in").toStringList();
+    outputFileExtensions = settings
+                               .value("OutputFileExtensions",
+                                      QStringList() << "out"
+                                                    << "ans")
+                               .toStringList();
     settings.endGroup();
-    
+
     int compilerCount = settings.beginReadArray("v1.2/CompilerSettings");
-    for (int i = 0; i < compilerCount; i ++) {
+    for (int i = 0; i < compilerCount; i++) {
         settings.setArrayIndex(i);
         Compiler *compiler = new Compiler;
         compiler->setCompilerType((Compiler::CompilerType)settings.value("CompilerType").toInt());
@@ -313,12 +319,13 @@ void Settings::loadSettings()
         compiler->setSourceExtensions(settings.value("SourceExtensions").toStringList().join(";"));
         compiler->setCompilerLocation(settings.value("CompilerLocation").toString());
         compiler->setInterpreterLocation(settings.value("InterpreterLocation").toString());
-        compiler->setBytecodeExtensions(settings.value("BytecodeExtensions").toStringList().join(";"));
+        compiler->setBytecodeExtensions(
+            settings.value("BytecodeExtensions").toStringList().join(";"));
         compiler->setTimeLimitRatio(settings.value("TimeLimitRatio").toDouble());
         compiler->setMemoryLimitRatio(settings.value("MemoryLimitRatio").toDouble());
         compiler->setDisableMemoryLimitCheck(settings.value("DisableMemoryLimitCheck").toBool());
         int configurationCount = settings.beginReadArray("Configuration");
-        for (int j = 0; j < configurationCount; j ++) {
+        for (int j = 0; j < configurationCount; j++) {
             settings.setArrayIndex(j);
             compiler->addConfiguration(settings.value("Name").toString(),
                                        settings.value("CompilerArguments").toString(),
@@ -326,7 +333,7 @@ void Settings::loadSettings()
         }
         QStringList values = settings.value("EnvironmentVariables").toStringList();
         QProcessEnvironment environment;
-        for (int i = 0; i < values.size(); i ++) {
+        for (int i = 0; i < values.size(); i++) {
             int tmp = values[i].indexOf('=');
             QString variable = values[i].mid(0, tmp);
             QString value = values[i].mid(tmp + 1);
@@ -337,14 +344,14 @@ void Settings::loadSettings()
         addCompiler(compiler);
     }
     settings.endArray();
-    
+
     int listCount = settings.beginReadArray("v1.2/RecentContest");
-    for (int i = 0; i < listCount; i ++) {
+    for (int i = 0; i < listCount; i++) {
         settings.setArrayIndex(i);
         recentContest.append(settings.value("Location").toString());
     }
     settings.endArray();
-    
+
 #ifdef Q_OS_WIN32
     diffPath = QDir::toNativeSeparators(QDir::currentPath()) + QDir::separator() + "diff.exe";
 #endif
