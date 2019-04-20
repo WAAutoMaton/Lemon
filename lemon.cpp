@@ -598,7 +598,7 @@ void Lemon::aboutLemon()
     QString text;
     text += "<h2>Project Lemon</h2>";
     text += tr("A tiny judging environment for OI contest") + "<br>";
-    text += tr("Version 1.3 Beta") + "<br>";
+    text += tr("Version 1.2") + "<br>";
     text += tr("Build Date: %1").arg(__DATE__) + "<br>";
     text +=
         tr("Copyright (c) 2011 <a href=\"http://hi.baidu.com/oimaster\">Zhipeng Jia</a>") + "<br>";
