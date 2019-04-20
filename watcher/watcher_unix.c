@@ -87,6 +87,7 @@ int main(int argc, char *argv[]) {
         if (memoryLimit != -1)
             setrlimit(RLIMIT_AS, &(struct rlimit){memoryLimit, memoryLimit});
         setrlimit(RLIMIT_CPU, &(struct rlimit){timeLimit, timeLimit + 1});
+        setrlimit(RLIMIT_STACK,&(struct rlimit){RLIM_INFINITY,RLIM_INFINITY});
         if (execlp("bash", "bash", "-c", argv[1], NULL) == -1) return 1;
     }
     
