@@ -132,7 +132,7 @@ bool AssignmentThread::traditionalTaskPrepare()
         for (QString &i : dirs) {
             if (i == "." || i == "..")
                 continue;
-            QString nowPath(Settings::sourcePath() + contestantName + '/' + i);
+            QString nowPath(Settings::sourcePath() + contestantName + QDir::separator() + i);
             QDir nowDir(nowPath);
             for (const QString &nowFile : nowDir.entryList(filters, QDir::Files)) {
                 files.append(i + QDir::separator() + nowFile);
@@ -153,13 +153,14 @@ bool AssignmentThread::traditionalTaskPrepare()
         if (!sourceFile.isEmpty()) {
             QDir(Settings::temporaryPath()).mkdir(contestantName);
 
-            if (sourceFile.indexOf("/") != -1) //如果源文件在子文件夹内则需要特殊处理一下
+            if (sourceFile.indexOf(QDir::separator())
+                != -1) //如果源文件在子文件夹内则需要特殊处理一下
             {
                 QFile::copy(Settings::sourcePath() + contestantName + QDir::separator()
                                 + sourceFile,
                             Settings::temporaryPath() + contestantName + QDir::separator()
-                                + sourceFile.split('/').at(1));
-                sourceFile = sourceFile.split('/').at(1);
+                                + sourceFile.split(QDir::separator()).at(1));
+                sourceFile = sourceFile.split(QDir::separator()).at(1);
             } else {
                 QFile::copy(
                     Settings::sourcePath() + contestantName + QDir::separator() + sourceFile,
@@ -175,17 +176,8 @@ bool AssignmentThread::traditionalTaskPrepare()
                     timeLimitRatio = compilerList[i]->getTimeLimitRatio();
                     memoryLimitRatio = compilerList[i]->getMemoryLimitRatio();
                     disableMemoryLimitCheck = compilerList[i]->getDisableMemoryLimitCheck();
-                    environment = compilerList[i]->getEnvironment();
-                    QStringList values = environment.toStringList();
-                    for (int k = 0; k < values.size(); k++) {
-                        int tmp = values[k].indexOf("=");
-                        QString variable = values[k].mid(0, tmp);
-                        environment.insert(
-                            variable,
-                            environment.value(variable) + ";"
-                                + QProcessEnvironment::systemEnvironment().value(variable));
-                    }
-
+                    environment = QProcessEnvironment::systemEnvironment();
+                    environment.insert(compilerList[i]->getEnvironment());
                     if (compilerList[i]->getCompilerType() == Compiler::Typical) {
 #ifdef LEMON_OS_WIN32
                         executableFile = task->getSourceFileName() + ".exe";
