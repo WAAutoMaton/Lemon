@@ -31,7 +31,6 @@
 ```shell
 git clone https://github.com/WAAutoMaton/Lemon
 cd Lemon
-lrelease -verbose Lemon_zh_CN.ts Lemon_zh_CN.qm
 qmake lemon.pro
 make
 ```
