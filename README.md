@@ -5,7 +5,7 @@
 
 原版作者为 [@zhipeng-jia](https://github.com/zhipeng-jia)，此版本为修改版本。
 
-由于未在 Windows 平台和 MacOS 平台做过适配，目前此版本仅支持 Linux。
+目前该版本已支持 Windows 和 Linux 平台，由于我没有 Mac 所以没法测试 MacOS平台，如果发现 MacOS 下有 bug 请在 issue 区提出。
 
 ## 该版本特性
 
@@ -16,12 +16,11 @@
 ## Flags:
 
 * 从 syzoj 的 data.yml 中导入数据。
-* 增加对 Windows 平台的支持（因为我没有 Mac 所以没法测试 MacOS平台，如果发现 MacOS 下有 bug 请在 issue 区提出）。
 * 有好的建议欢迎在 issue 区中提出。
 
 ## 安装
 
-直接下载 release 中的静态编译包，或按照下面的方式编译。
+直接下载 release 中的预编译包（目前已有 Windows 和 Linux 平台的预编译包），或按照下面的方式编译。
 
 ## 编译
 首先安装 Qt5 SDK。
