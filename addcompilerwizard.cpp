@@ -3,16 +3,16 @@
 #include "ui_addcompilerwizard.h"
 #include "compiler.h"
 
-AddCompilerWizard::AddCompilerWizard(QWidget *parent) :
-    QWizard(parent),
-    ui(new Ui::AddCompilerWizard)
+AddCompilerWizard::AddCompilerWizard(QWidget *parent)
+    : QWizard(parent)
+    , ui(new Ui::AddCompilerWizard)
 {
     ui->setupUi(this);
-    
+
     ui->sourceFileExtensions->setValidator(new QRegExpValidator(QRegExp("(\\w+;)*\\w+"), this));
     ui->bytecodeFileExtensions->setValidator(new QRegExpValidator(QRegExp("(\\w+;)*\\w+"), this));
     ui->javaMemoryLimit->setValidator(new QIntValidator(64, 2048, this));
-    
+
 #ifdef LEMON_OS_UNIX
     if (QFileInfo("/usr/bin/gcc").exists())
         ui->gccPath->setText("/usr/bin/gcc");
@@ -27,27 +27,18 @@ AddCompilerWizard::AddCompilerWizard(QWidget *parent) :
     if (QFileInfo("/usr/bin/python").exists())
         ui->pythonPath->setText("/usr/bin/python");
 #endif
-    
-    connect(ui->typeSelect, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(compilerTypeChanged()));
-    connect(ui->compilerSelectButton, SIGNAL(clicked()),
-            this, SLOT(selectCompilerLocation()));
-    connect(ui->interpreterSelectButton, SIGNAL(clicked()),
-            this, SLOT(selectInterpreterLocation()));
-    connect(ui->gccSelectButton, SIGNAL(clicked()),
-            this, SLOT(selectGccPath()));
-    connect(ui->gppSelectButton, SIGNAL(clicked()),
-            this, SLOT(selectGppPath()));
-    connect(ui->fpcSelectButton, SIGNAL(clicked()),
-            this, SLOT(selectFpcPath()));
-    connect(ui->fbcSelectButton, SIGNAL(clicked()),
-            this, SLOT(selectFbcPath()));
-    connect(ui->javacSelectButton, SIGNAL(clicked()),
-            this, SLOT(selectJavacPath()));
-    connect(ui->javaSelectButton, SIGNAL(clicked()),
-            this, SLOT(selectJavaPath()));
-    connect(ui->pythonSelectButton, SIGNAL(clicked()),
-            this, SLOT(selectPythonPath()));
+
+    connect(ui->typeSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(compilerTypeChanged()));
+    connect(ui->compilerSelectButton, SIGNAL(clicked()), this, SLOT(selectCompilerLocation()));
+    connect(ui->interpreterSelectButton, SIGNAL(clicked()), this,
+            SLOT(selectInterpreterLocation()));
+    connect(ui->gccSelectButton, SIGNAL(clicked()), this, SLOT(selectGccPath()));
+    connect(ui->gppSelectButton, SIGNAL(clicked()), this, SLOT(selectGppPath()));
+    connect(ui->fpcSelectButton, SIGNAL(clicked()), this, SLOT(selectFpcPath()));
+    connect(ui->fbcSelectButton, SIGNAL(clicked()), this, SLOT(selectFbcPath()));
+    connect(ui->javacSelectButton, SIGNAL(clicked()), this, SLOT(selectJavacPath()));
+    connect(ui->javaSelectButton, SIGNAL(clicked()), this, SLOT(selectJavaPath()));
+    connect(ui->pythonSelectButton, SIGNAL(clicked()), this, SLOT(selectPythonPath()));
 }
 
 AddCompilerWizard::~AddCompilerWizard()
@@ -55,7 +46,7 @@ AddCompilerWizard::~AddCompilerWizard()
     delete ui;
 }
 
-const QList<Compiler*>& AddCompilerWizard::getCompilerList() const
+const QList<Compiler *> &AddCompilerWizard::getCompilerList() const
 {
     return compilerList;
 }
@@ -69,7 +60,10 @@ int AddCompilerWizard::nextId() const
             return 2;
         }
     } else {
-        if (currentId() == 3) return -1; else return 3;
+        if (currentId() == 3)
+            return -1;
+        else
+            return 3;
     }
 }
 
@@ -83,25 +77,30 @@ bool AddCompilerWizard::validateCurrentPage()
         }
         if (ui->compilerLocation->isEnabled() && ui->compilerLocation->text().isEmpty()) {
             ui->compilerLocation->setFocus();
-            QMessageBox::warning(this, tr("Error"), tr("Empty compiler location!"), QMessageBox::Close);
+            QMessageBox::warning(this, tr("Error"), tr("Empty compiler location!"),
+                                 QMessageBox::Close);
             return false;
         }
         if (ui->interpreterLocation->isEnabled() && ui->interpreterLocation->text().isEmpty()) {
             ui->interpreterLocation->setFocus();
-            QMessageBox::warning(this, tr("Error"), tr("Empty interpreter location!"), QMessageBox::Close);
+            QMessageBox::warning(this, tr("Error"), tr("Empty interpreter location!"),
+                                 QMessageBox::Close);
             return false;
         }
         if (ui->sourceFileExtensions->text().isEmpty()) {
             ui->sourceFileExtensions->setFocus();
-            QMessageBox::warning(this, tr("Error"), tr("Empty source file extensions!"), QMessageBox::Close);
+            QMessageBox::warning(this, tr("Error"), tr("Empty source file extensions!"),
+                                 QMessageBox::Close);
             return false;
         }
-        if (ui->bytecodeFileExtensions->isEnabled() && ui->bytecodeFileExtensions->text().isEmpty()) {
+        if (ui->bytecodeFileExtensions->isEnabled()
+            && ui->bytecodeFileExtensions->text().isEmpty()) {
             ui->bytecodeFileExtensions->setFocus();
-            QMessageBox::warning(this, tr("Error"), tr("Empty byte-code file extensions!"), QMessageBox::Close);
+            QMessageBox::warning(this, tr("Error"), tr("Empty byte-code file extensions!"),
+                                 QMessageBox::Close);
             return false;
         }
-        
+
         QString text;
         text += tr("[Custom Compiler]") + "\n";
         text += tr("Compiler Name: ") + ui->compilerName->text() + "\n";
@@ -117,14 +116,16 @@ bool AddCompilerWizard::validateCurrentPage()
             text += tr("Byte-code File Extensions: ") + ui->bytecodeFileExtensions->text() + "\n";
         }
         if (ui->defaultCompilerArguments->isEnabled()) {
-            text += tr("Default Compiler\'s Arguments: ") + ui->defaultCompilerArguments->text() + "\n";
+            text +=
+                tr("Default Compiler\'s Arguments: ") + ui->defaultCompilerArguments->text() + "\n";
         }
         if (ui->defaultInterpreterArguments->isEnabled()) {
-            text += tr("Default Interpreter\'s Arguments: ") + ui->defaultInterpreterArguments->text() + "\n";
+            text += tr("Default Interpreter\'s Arguments: ")
+                + ui->defaultInterpreterArguments->text() + "\n";
         }
         ui->logViewer->setPlainText(text);
     }
-    
+
     if (currentId() == 2) {
         if (ui->gccGroupBox->isEnabled() && ui->gccPath->text().isEmpty()) {
             ui->gccPath->setFocus();
@@ -161,7 +162,7 @@ bool AddCompilerWizard::validateCurrentPage()
             QMessageBox::warning(this, tr("Error"), tr("Empty python path!"), QMessageBox::Close);
             return false;
         }
-        
+
         QString text;
         if (ui->gccGroupBox->isEnabled()) {
             text += tr("[gcc Compiler]") + "\n";
@@ -205,7 +206,7 @@ bool AddCompilerWizard::validateCurrentPage()
         }
         ui->logViewer->setPlainText(text);
     }
-    
+
     return true;
 }
 
@@ -224,7 +225,7 @@ void AddCompilerWizard::compilerTypeChanged()
         ui->defaultInterpreterArgumentsLabel->setEnabled(true);
         ui->defaultInterpreterArguments->setEnabled(true);
     }
-    
+
     if (ui->typeSelect->currentIndex() == 1) {
         ui->bytecodeFileExtensionsLabel->setEnabled(true);
         ui->bytecodeFileExtensions->setEnabled(true);
@@ -232,7 +233,7 @@ void AddCompilerWizard::compilerTypeChanged()
         ui->bytecodeFileExtensionsLabel->setEnabled(false);
         ui->bytecodeFileExtensions->setEnabled(false);
     }
-    
+
     if (ui->typeSelect->currentIndex() == 2) {
         ui->compilerLocationLabel->setEnabled(false);
         ui->compilerLocation->setEnabled(false);
@@ -251,15 +252,15 @@ void AddCompilerWizard::compilerTypeChanged()
 void AddCompilerWizard::selectCompilerLocation()
 {
 #ifdef LEMON_OS_WIN32
-    QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
-                                                    QDir::rootPath(), tr("Executable files (*.exe)"));
+    QString location = QFileDialog::getOpenFileName(
+        this, tr("Select Compiler\'s Location"), QDir::rootPath(), tr("Executable files (*.exe)"));
 #endif
-    
+
 #ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), tr("Executable files (*.*)"));
 #endif
-    if (! location.isEmpty()) {
+    if (!location.isEmpty()) {
         location = location.replace('/', QDir::separator());
         ui->compilerLocation->setText(location);
     }
@@ -268,15 +269,16 @@ void AddCompilerWizard::selectCompilerLocation()
 void AddCompilerWizard::selectInterpreterLocation()
 {
 #ifdef LEMON_OS_WIN32
-    QString location = QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"),
-                                                    QDir::rootPath(), tr("Executable files (*.exe)"));
+    QString location =
+        QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"), QDir::rootPath(),
+                                     tr("Executable files (*.exe)"));
 #endif
-    
+
 #ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"),
                                                     QDir::rootPath(), tr("Executable files (*.*)"));
 #endif
-    if (! location.isEmpty()) {
+    if (!location.isEmpty()) {
         location = location.replace('/', QDir::separator());
         ui->interpreterLocation->setText(location);
     }
@@ -288,12 +290,12 @@ void AddCompilerWizard::selectGccPath()
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "gcc (gcc.exe)");
 #endif
-    
+
 #ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "gcc (gcc)");
 #endif
-    if (! location.isEmpty()) {
+    if (!location.isEmpty()) {
         location = location.replace('/', QDir::separator());
         ui->gccPath->setText(location);
     }
@@ -305,12 +307,12 @@ void AddCompilerWizard::selectGppPath()
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "g++ (g++.exe)");
 #endif
-    
+
 #ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "g++ (g++)");
 #endif
-    if (! location.isEmpty()) {
+    if (!location.isEmpty()) {
         location = location.replace('/', QDir::separator());
         ui->gppPath->setText(location);
     }
@@ -322,12 +324,12 @@ void AddCompilerWizard::selectFpcPath()
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "fpc (fpc.exe)");
 #endif
-    
+
 #ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "fpc (fpc)");
 #endif
-    if (! location.isEmpty()) {
+    if (!location.isEmpty()) {
         location = location.replace('/', QDir::separator());
         ui->fpcPath->setText(location);
     }
@@ -339,12 +341,12 @@ void AddCompilerWizard::selectFbcPath()
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "fbc (fbc.exe)");
 #endif
-    
+
 #ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "fbc (fbc)");
 #endif
-    if (! location.isEmpty()) {
+    if (!location.isEmpty()) {
         location = location.replace('/', QDir::separator());
         ui->fbcPath->setText(location);
     }
@@ -356,12 +358,12 @@ void AddCompilerWizard::selectJavacPath()
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "javac (javac.exe)");
 #endif
-    
+
 #ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Compiler\'s Location"),
                                                     QDir::rootPath(), "javac (javac)");
 #endif
-    if (! location.isEmpty()) {
+    if (!location.isEmpty()) {
         location = location.replace('/', QDir::separator());
         ui->javacPath->setText(location);
     }
@@ -373,12 +375,12 @@ void AddCompilerWizard::selectJavaPath()
     QString location = QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"),
                                                     QDir::rootPath(), "java (java.exe)");
 #endif
-    
+
 #ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"),
                                                     QDir::rootPath(), "java (java)");
 #endif
-    if (! location.isEmpty()) {
+    if (!location.isEmpty()) {
         location = location.replace('/', QDir::separator());
         ui->javaPath->setText(location);
     }
@@ -390,12 +392,12 @@ void AddCompilerWizard::selectPythonPath()
     QString location = QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"),
                                                     QDir::rootPath(), "python (python.exe)");
 #endif
-    
+
 #ifdef LEMON_OS_UNIX
     QString location = QFileDialog::getOpenFileName(this, tr("Select Interpreter\'s Location"),
                                                     QDir::rootPath(), "python (python)");
 #endif
-    if (! location.isEmpty()) {
+    if (!location.isEmpty()) {
         location = location.replace('/', QDir::separator());
         ui->pythonPath->setText(location);
     }
@@ -411,12 +413,11 @@ void AddCompilerWizard::accept()
         compiler->setInterpreterLocation(ui->interpreterLocation->text());
         compiler->setSourceExtensions(ui->sourceFileExtensions->text());
         compiler->setBytecodeExtensions(ui->bytecodeFileExtensions->text());
-        compiler->addConfiguration("default",
-                                   ui->defaultCompilerArguments->text(),
+        compiler->addConfiguration("default", ui->defaultCompilerArguments->text(),
                                    ui->defaultInterpreterArguments->text());
         compilerList.append(compiler);
     }
-    
+
     if (ui->builtinRadioButton->isChecked()) {
         if (ui->gccGroupBox->isEnabled()) {
             Compiler *compiler = new Compiler;
@@ -424,9 +425,17 @@ void AddCompilerWizard::accept()
             compiler->setCompilerLocation(ui->gccPath->text());
             compiler->setSourceExtensions("c");
             if (ui->gccO2Check->isChecked()) {
+#ifdef LEMON_OS_WIN32
+                compiler->addConfiguration("default", "-o %s %s.* -O2 -Wl,--stack=1145141919", "");
+#else
                 compiler->addConfiguration("default", "-o %s %s.* -O2", "");
+#endif
             } else {
+#ifdef LEMON_OS_WIN32
+                compiler->addConfiguration("default", "-o %s %s.* -Wl,--stack=1145141919", "");
+#else
                 compiler->addConfiguration("default", "-o %s %s.*", "");
+#endif
             }
 #ifdef LEMON_OS_WIN32
             QProcessEnvironment environment;
@@ -437,16 +446,24 @@ void AddCompilerWizard::accept()
 #endif
             compilerList.append(compiler);
         }
-        
+
         if (ui->gppGroupBox->isEnabled()) {
             Compiler *compiler = new Compiler;
             compiler->setCompilerName("g++");
             compiler->setCompilerLocation(ui->gppPath->text());
             compiler->setSourceExtensions("cpp;cc;cxx");
             if (ui->gppO2Check->isChecked()) {
+#ifdef LEMON_OS_WIN32
+                compiler->addConfiguration("default", "-o %s %s.* -O2 -Wl,--stack=1145141919", "");
+#else
                 compiler->addConfiguration("default", "-o %s %s.* -O2", "");
+#endif
             } else {
+#ifdef LEMON_OS_WIN32
+                compiler->addConfiguration("default", "-o %s %s.* -Wl,--stack=1145141919", "");
+#else
                 compiler->addConfiguration("default", "-o %s %s.*", "");
+#endif
             }
 #ifdef LEMON_OS_WIN32
             QProcessEnvironment environment;
@@ -457,7 +474,7 @@ void AddCompilerWizard::accept()
 #endif
             compilerList.append(compiler);
         }
-        
+
         if (ui->fpcGroupBox->isEnabled()) {
             Compiler *compiler = new Compiler;
             compiler->setCompilerName("fpc");
@@ -470,7 +487,7 @@ void AddCompilerWizard::accept()
             }
             compilerList.append(compiler);
         }
-        
+
         if (ui->fbcGroupBox->isEnabled()) {
             Compiler *compiler = new Compiler;
             compiler->setCompilerName("fbc");
@@ -479,7 +496,7 @@ void AddCompilerWizard::accept()
             compiler->addConfiguration("default", "%s.*", "");
             compilerList.append(compiler);
         }
-        
+
         if (ui->javaGroupBox->isEnabled()) {
             Compiler *compiler = new Compiler;
             compiler->setCompilerName("jdk");
@@ -490,10 +507,11 @@ void AddCompilerWizard::accept()
             compiler->setBytecodeExtensions("class");
             compiler->setTimeLimitRatio(5);
             compiler->setDisableMemoryLimitCheck(true);
-            compiler->addConfiguration("default", "%s.*", QString("-Xmx%1m %s").arg(ui->javaMemoryLimit->text()));
+            compiler->addConfiguration("default", "%s.*",
+                                       QString("-Xmx%1m %s").arg(ui->javaMemoryLimit->text()));
             compilerList.append(compiler);
         }
-        
+
         if (ui->pythonGroupBox->isEnabled()) {
             Compiler *compiler = new Compiler;
             compiler->setCompilerName("python");
@@ -506,6 +524,6 @@ void AddCompilerWizard::accept()
             compilerList.append(compiler);
         }
     }
-    
+
     QWizard::accept();
 }
